@@ -14,6 +14,9 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
-    readEmail.open_message(r"C:\Users\tomas\OneDrive - Duale Hochschule Baden-Württemberg Stuttgart\Projekt\EmailFiles\Gremienwahlen.txt")
+    path = input("Enter the path to email file: ") # comment out when using hardcoded poath below
+    print("Using the following path: " + path) # comment out when using hardcoded poath below
+    # path = r"C:\Users\tomas\OneDrive - Duale Hochschule Baden-Württemberg Stuttgart\Projekt\EmailFiles\Gremienwahlen.txt" # hardcoded path for dev
+    readEmail.open_message(path)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
