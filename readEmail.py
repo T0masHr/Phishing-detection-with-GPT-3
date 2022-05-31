@@ -7,7 +7,7 @@ from email.message import EmailMessage
 def open_message(textfile):
     with open(textfile) as fp:
         # Create a text/plain message
-        msg = EmailMreessage()
+        msg = EmailMessage()
         msg.set_content(fp.read())
 
         print(msg)
