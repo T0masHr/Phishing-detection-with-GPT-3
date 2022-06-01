@@ -1,0 +1,7 @@
+"Liebe Mitarbeiter,\n \nBeachten Sie dieses wichtige "
+"Update, dass unser neues Webmail mit einem neuen \nMessaging-System von Microsoft verbessert wurde, "
+"das auch eine schnellere Nutzung \nvon E-Mails, freigegebenen Kalendern, Webdokumenten und der neuen "
+"Anti-Spam-\nVersion 2021 umfasst. \n \nBitte verwenden Sie den unten stehenden Link, um Ihr Microsoft "
+"Web-Mail-\nBenutzerauthentifizierungsformular 2021 auszufüllen. \n \nKLICKEN Sie auf Outlook Web "
+"Access, um sofort zu aktualisieren. \n \nIT Service Center (Rechenzentrum) - DHBW Stuttgart \n© "
+"Copyright 2021 - DHBW Stuttgart. Alle Rechte vorbehalten.\n\n"
