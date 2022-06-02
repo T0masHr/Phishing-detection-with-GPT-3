@@ -1,21 +1,23 @@
 import logging
 import argparse
 import openai
+
+import chatbot # import file with chatbot functions
 # import os
 # Import the email modules we'll need
 from email.message import EmailMessage
 
 openai.api_key = "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"  # the key should be loaded from envvar # os.getenv("OPENAI_API_KEY")
+default_path = "emailMessages\placeholderMessage.txt"
 
 
 # TODO: -
 #  implement additional args:
-#  1. - the ability to disable the actual api call to openai to save credits;
+#  1. - exception handling for file opener to handle invalid path
 #  2. - provide the file path per arg instead of stdin;
 #  3. - supply the openai API_KEY with arg;
 #  extract the actual "text" field from the api response, maybe display the whole response when logging is set to debug
 #  add the ability to check multiple files at once or rather to supply a folder with files to check
-
 
 
 def open_message(textfile):
@@ -25,13 +27,6 @@ def open_message(textfile):
         # Create a text/plain message
         text_from_file = f'''{fp.read()}'''
         return text_from_file
-
-        # handling the file as email message using the email module:
-        # msg = EmailMessage()
-        # msg.set_content(readText)
-        # msg_string = msg.as_string()
-        # # print(msg)
-        # return msg_string
 
 
 def api_call_completion(prompt, msg_input):
@@ -52,27 +47,43 @@ def api_call_completion(prompt, msg_input):
     return response
 
 
+def setup_logging(verbosity_level):
+    base_loglevel = 30
+    verbosity_level = min(verbosity_level, 2)
+    loglevel = base_loglevel - (verbosity_level * 10)  # loglevel goes from 10 to 50, intervals of 10
+    # logging.DEBUG = 10; logging.CRITICAL = 50
+    logging.basicConfig(level=loglevel, format='%(levelname)s:%(message)s')
+
+
 #######################################################################################################################
 def main():
     # command line arguments handling:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-debug', action='store_true', help='Turn DEBUG output ON')
+    parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
+                        help="set output verbosity: -v for INFO; -vv for DEBUG")
+    parser.add_argument("--enable_api", action="store_true", help="enable the call to openai api")
+    parser.add_argument("--demo", action="store_true", help="use demo values")
+    parser.add_argument("path", help="uses this string as path to single file", default=default_path)  # this arg is required
+    parser.add_argument("--chatbot", action="store_true", help="switch to chatbot mode")
     options = parser.parse_args()
 
-    if options.debug is True:
-        logging.basicConfig(level=logging.DEBUG)
-        # Print the Library's installation path
+    setup_logging(options.verbosity_level) # call the function to set up logging with provided verbosity level
+    if options.chatbot:
+        chatbot()
+
+    if options.demo:  # check if user input is empty, if it is, use following hardcoded path:
+        logging.warning('Empty input, falling back to default path')
+        path = default_path  # hardcoded path here
     else:
-        logging.basicConfig(level=logging.WARNING)
+        path = options.path
+    # END of args handling          #############################################
 
     logging.info('Starting...')
     logging.debug(f'Called function "{main.__name__}"')
 
-    path = input("Enter the path to email file: \n")
+    # path = input("Enter the path to email file: \n")
 
-    if not path:  # check if user input is empty, if it is, use following hardcoded path:
-        logging.warning('Empty input, falling back to default path')
-        path = r"emailMessages\placeholderMessage.txt"  # hardcoded path here
+
 
     logging.info(f'Using the following path:  {path} \n')
 
@@ -82,10 +93,13 @@ def main():
 
     default_api_prompt = "Determine if this email is a phishing email:\n\n"
 
-    # following is responsible for the api call, disabled to save credits:
-    # api_response = api_call_completion(default_api_prompt, msg_to_check)
-    # print("API response: \n")
-    # print(api_response)
+    if options.enable_api:
+        # following is responsible for the api call, disabled to save credits:
+        api_response = api_call_completion(default_api_prompt, msg_to_check)
+        print("API response: \n")
+        print(api_response)
+    else:
+        print("no actual api call performed to save credits. \n use argument '--enable_api' to use openai's api ")
 
 
 # Press the green button in the gutter to run the script.
