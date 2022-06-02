@@ -9,8 +9,8 @@ import chatbot  # import file with chatbot functions
 from email.message import EmailMessage
 import dev_defaults
 
-openai.api_key = dev_defaults.API_KEY  # the key should be loaded from envvar # os.getenv("OPENAI_API_KEY")
 DEFAULT_PATH = dev_defaults.DEFAULT_PATH
+DEFAULT_API_KEY = dev_defaults.API_KEY  # the key should be loaded from envvar # os.getenv("OPENAI_API_KEY")
 
 
 # TODO: -
@@ -21,7 +21,7 @@ DEFAULT_PATH = dev_defaults.DEFAULT_PATH
 #  extract the actual "text" field from the api response, maybe display the whole response when logging is set to debug
 #  add the ability to check multiple files at once or rather to supply a folder with files to check
 
-def open_path(supplied_path):
+def open_path(supplied_path: str):
     logging.debug(f"Called function '{open_path.__name__}' and using '{supplied_path}' as its parameter")
 
     path = Path(supplied_path)
@@ -32,7 +32,7 @@ def open_path(supplied_path):
     return msg_to_check
 
 
-def open_message(textfile):
+def open_message(textfile) -> str:
     logging.debug(f"Called function '{open_message.__name__}' and using '{textfile}' as its parameter")
     # Open the plain text file whose name is in textfile for reading.
 
@@ -44,6 +44,10 @@ def open_message(textfile):
     except FileNotFoundError:
         logging.critical(f"!!! THE FILE {textfile} WAS NOT FOUND, ABORTING EXECUTION !!!")
         exit()
+
+
+def api_response_get_text(response) -> str:
+    return response['choices'][0]['text']
 
 
 def api_call_completion(prompt, msg_input):
@@ -81,16 +85,18 @@ def setup_logging(verbosity_level):
 def main():
     # command line arguments handling:
     parser = argparse.ArgumentParser()
+    parser.add_argument("api_key", nargs="?", default=DEFAULT_API_KEY, help="API_KEY for openai")
+    parser.add_argument("path", nargs="?", default=DEFAULT_PATH, help="uses this string as path to single file")
     parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
     parser.add_argument("--enable_api", action="store_true", help="enable the call to openai api")
     parser.add_argument("--demo", action="store_true", help="use demo values")
-    parser.add_argument("path", nargs="?", default=DEFAULT_PATH, help="uses this string as path to single file")
-    parser.add_argument("api_key", nargs="?", help="API_KEY for openai")
 
     # parser.add_argument("--chatbot", action="store_true", help="switch to chatbot mode")
     options = parser.parse_args()
     setup_logging(options.verbosity_level)  # call the function to set up logging with provided verbosity level
+
+    openai.api_key = options.api_key
 
     if options.demo:  # check if user input is empty, if it is, use following hardcoded path:
         demo_devmode()
@@ -108,8 +114,10 @@ def main():
     if options.enable_api:
         # following is responsible for the api call, disabled to save credits:
         api_response = api_call_completion(default_api_prompt, msg_to_check)
+        answered_text = api_response_get_text(api_response)
         print("API response: \n")
-        print(api_response)
+        print(answered_text)
+        logging.debug(f"Full API response \n {api_response}")
     else:
         print("no actual api call performed to save credits. \n use argument '--enable_api' to use openai's api ")
 
