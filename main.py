@@ -1,5 +1,7 @@
 import logging
 import argparse
+import sys
+
 import openai
 from pathlib import Path
 
@@ -13,13 +15,9 @@ DEFAULT_PATH = dev_defaults.DEFAULT_PATH
 DEFAULT_API_KEY = dev_defaults.API_KEY  # the key should be loaded from envvar # os.getenv("OPENAI_API_KEY")
 
 
-# TODO: -
-#  implement additional args:
-#  1. - exception handling for file opener to handle invalid path
-#  2. - provide the file path per arg instead of stdin;
-#  3. - supply the openai API_KEY with arg;
-#  extract the actual "text" field from the api response, maybe display the whole response when logging is set to debug
-#  add the ability to check multiple files at once or rather to supply a folder with files to check
+# TODO:
+#  - check if supplied path is file or folder
+#  - supply the openai API_KEY with arg;
 
 def open_path(supplied_path: str):
     logging.debug(f"Called function '{open_path.__name__}' and using '{supplied_path}' as its parameter")
@@ -91,15 +89,23 @@ def main():
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
     parser.add_argument("--enable_api", action="store_true", help="enable the call to openai api")
     parser.add_argument("--demo", action="store_true", help="use demo values")
+    parser.add_argument("--no_text", action="store_false", dest="print_text", help="Do not reflect the supplied text back in console")
 
     # parser.add_argument("--chatbot", action="store_true", help="switch to chatbot mode")
     options = parser.parse_args()
     setup_logging(options.verbosity_level)  # call the function to set up logging with provided verbosity level
 
+    print_text = options.print_text
+
+    if options.api_key is DEFAULT_API_KEY:
+        logging.info("No api_key supplied, using the default key")
+
     openai.api_key = options.api_key
 
     if options.demo:  # check if user input is empty, if it is, use following hardcoded path:
         demo_devmode()
+
+
 
     # END of args handling          #############################################
 
@@ -107,7 +113,8 @@ def main():
     logging.debug(f"Called function '{main.__name__}'")
 
     msg_to_check = open_path(options.path)
-    print(msg_to_check)  # print the text back to user
+    if print_text:
+        print(msg_to_check)  # print the text back to user
 
     default_api_prompt = "Determine if this email is a phishing email:\n\n"
 
