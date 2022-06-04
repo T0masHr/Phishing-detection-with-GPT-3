@@ -18,10 +18,12 @@ DEFAULT_API_PROMPT = "Determine if this email is a phishing email:\n\n"
 
 # TODO:
 #  - check if supplied path is file or folder
-#  - supply the openai API_KEY with arg;
 
-def open_path(supplied_path_list):
-    logging.debug(f"Called function '{open_path.__name__}'")
+
+def get_paths_list(supplied_path_list: list) -> list:
+    # This function transforms the user supplied paths strings into Path() objects from pathlib.
+    # The function returns a list with those objects
+    logging.debug(f"Called function '{get_paths_list.__name__}'")
     logging.debug(f"Your list contains the following items:\n{chr(10).join(supplied_path_list)}\n")
     logging.debug(f"The parameter has the type {type(supplied_path_list)}")
     path_list = []
@@ -36,19 +38,30 @@ def open_path(supplied_path_list):
             p = Path(i)  # create Path object from one item in list
             path_list.append(p)  # append the newly created Path to the path list
 
+        logging.debug(f"Following list with paths was created: \n{path_list}\n")
         logging.debug(f"Following list with paths was created: \n{chr(10).join(map(str, path_list))}\n")
 
-    # path = Path(supplied_path)
-    # logging.info(f"Using the following path:  {path} \n")
-    #
-    # if path.is_file():
-    #     logging.info("The supplied path is a file path")
-    #
-    # if path.is_dir():
-    #     logging.info("The supplied path is a folder path")
+    # TODO: check if a path is a folder path, if it is get all files in the folder and return paths to single files
+    # TODO: after this isimplemented, this function should return a list of all filepaths
+    for i in path_list:
+        if i.is_file():
+            logging.debug(f"The path '{i}' is a file path")
 
-    # msg_to_check = open_message(path)  # call the function to open file at supplied path
-    # return msg_to_check
+        if i.is_dir():
+            logging.debug(f"The path '{i}' is a folder path")
+
+    files_list = []  # fill with only file paths and no folder paths
+
+    return files_list
+
+
+def open_path(path_list: list):
+    # TODO
+    path = Path(supplied_path)
+    logging.info(f"Using the following path:  {path} \n")
+
+    msg_to_check = open_message(path)  # call the function to open file at supplied path
+    return msg_to_check
 
 
 def open_message(textfile) -> str:
@@ -134,7 +147,7 @@ def main():
     logging.info("Starting...")
     logging.debug(f"The path supplied is: {type(options.path)}")
 
-    msg_to_check = open_path(options.path)
+    msg_to_check = get_paths_list(options.path)
     if print_text:
         logging.info("Opening message completed, following text was read: \n")
         print(msg_to_check)  # print the text back to user
