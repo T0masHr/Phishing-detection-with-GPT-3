@@ -110,7 +110,7 @@ def api_calls_on_dict(msg_dict: dict, base_api_prompt: str) -> dict:
 
     api_result_dict = {}  # declare empty dict which will be returned by this function
 
-    for key, value in msg_dict:  # loop over the whole msg_list with key and value of the msg_list
+    for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
         response = api_call_completion(base_api_prompt,
                                        value)  # get the api_call with the base_api_prompt and the value of the call
         api_result_dict[key] = response  # create new item in dict, that stores the response of the call
@@ -124,19 +124,20 @@ def get_text_from_response_dict(api_result_dict: dict) -> dict:
     # return is a dictionary with the filename as key and the textual response as value
     api_result_text_dict = {}
 
-    for key, value in api_result_dict:
+    for key, value in api_result_dict.items():
         api_result_text_dict[key] = api_response_get_text(value)
 
     return api_result_text_dict
 
 
-def prettyprint_api_text_response_dict(api_result_text_dict: dict):
+def prettyprint_api_text_response_dict(used_api_prompt: str, api_result_text_dict: dict):
     # this function prints all the api response to given files
     logging.debug(
         f"Called function '{prettyprint_api_text_response_dict.__name__}' and using '{api_result_text_dict}' as its parameter")
 
-    print("\n\n\n API response: \n")
-    for key, value in api_result_text_dict:
+    print(f"Using the prompt '{used_api_prompt}'")
+    print("API response:")
+    for key, value in api_result_text_dict.items():
         print(f"For the file {key} the API responded with {value} \n")
 
 
@@ -223,7 +224,7 @@ def main():
 
         api_responses_dict = api_calls_on_dict(messages_dict, base_api_prompt)
         api_text_responses = get_text_from_response_dict(api_responses_dict)
-        prettyprint_api_text_response_dict(api_text_responses)
+        prettyprint_api_text_response_dict(base_api_prompt, api_text_responses)
 
     else:
         logging.info(f"The argument '--enable_api' was not supplied, no api call")
