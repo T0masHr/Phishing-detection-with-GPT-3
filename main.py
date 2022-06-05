@@ -2,6 +2,7 @@ import json
 import logging
 import argparse
 import sys
+from pprint import pformat
 
 import openai
 from pathlib import Path
@@ -113,13 +114,13 @@ def parse_api_json_config(configfile):
     # this function loads the configuration for the api call
     f = open(configfile)
     config = json.load(f)
-    logging.debug(f"The following json config was loaded: {config}")
+    logging.info(f"The following json config was loaded: \n {pformat(config)}\n")
     return config
 
 
-def api_call_completion_endpoint(config: dict, prompt: str, msg_input: str):
+def api_call_completion_endpoint(config: dict, msg_input: str):
     logging.debug(f"Called function '{api_call_completion_endpoint.__name__}'")
-    logging.debug(f"First parameter is: '{prompt}'")
+    logging.debug(f"First parameter is: '{config}'")
     logging.debug(f"Second parameter is: '{msg_input}'")
 
     # call to the openai web api with the supplied email text body as input
@@ -145,16 +146,16 @@ def api_call_completion_endpoint(config: dict, prompt: str, msg_input: str):
     return response
 
 
-def api_calls_on_dict(config: dict, msg_dict: dict, base_api_prompt: str) -> dict:
+def api_calls_on_dict(config: dict, msg_dict: dict) -> dict:
     logging.debug(f"Called function '{api_calls_on_dict.__name__}'")
     # logging.debug(f"First parameter is: '{msg_dict}'")
-    logging.debug(f"First parameter is a dictionary with the keys: '{msg_dict.keys()}'")
-    logging.debug(f"Second parameter is: '{base_api_prompt}'")
+    logging.debug(f"First parameter is: '{config}'")
+    logging.debug(f"Second parameter is a dictionary with the keys: '{msg_dict.keys()}'")
 
     api_result_dict = {}  # declare empty dict which will be returned by this function
 
     for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
-        response = api_call_completion_endpoint(config, base_api_prompt,
+        response = api_call_completion_endpoint(config,
                                                 value)  # get the api_call with the base_api_prompt and the value of the call
         api_result_dict[key] = response  # create new item in dict, that stores the response of the call
         logging.debug(f"The API call for {key} finished")
@@ -243,7 +244,8 @@ def main():
     logging.info("Starting...")
 
     api_config = parse_api_json_config(json_config)
-    base_api_prompt = DEFAULT_API_PROMPT
+
+    # base_api_prompt = DEFAULT_API_PROMPT
 
     logging.debug(f"The path supplied is type: {type(options.path)}")
 
@@ -259,9 +261,9 @@ def main():
     if options.enable_api:
         logging.info("Api call is active")
 
-        api_responses_dict = api_calls_on_dict(api_config, messages_dict, base_api_prompt)
+        api_responses_dict = api_calls_on_dict(api_config, messages_dict)
         api_text_responses = get_text_from_response_dict(api_responses_dict)
-        prettyprint_api_text_response_dict(base_api_prompt, api_text_responses)
+        prettyprint_api_text_response_dict(api_config["prompt"], api_text_responses)
 
     else:
         logging.info(f"The argument '--enable_api' was not supplied, no api call")
