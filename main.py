@@ -16,8 +16,6 @@ DEFAULT_API_KEY = dev_defaults.API_KEY  # the key should be loaded from envvar #
 DEFAULT_API_PROMPT = "Determine if this email is a phishing email:\n\n"
 
 
-# TODO:
-#  - check if supplied path is file or folder
 
 
 def get_paths_list(supplied_path_list: list) -> list:
@@ -40,7 +38,7 @@ def get_paths_list(supplied_path_list: list) -> list:
             path_list.append(p)  # append the newly created Path to the path list
 
         logging.debug(f"Following list with paths was created: \n{path_list}\n")
-        logging.debug(f"Following list with paths was created: \n{chr(10).join(map(str, path_list))}\n")
+        # logging.debug(f"Following list with paths was created: \n{chr(10).join(map(str, path_list))}\n")
 
         logging.debug(f"Checking if the paths are files or directories")
 
@@ -51,10 +49,12 @@ def get_paths_list(supplied_path_list: list) -> list:
             logging.debug(f"The path '{path}' is a file path")
             files_list.append(path)
 
-        if path.is_dir():
+        elif path.is_dir():
             logging.debug(f"The path '{path}' is a folder path")
             for child_path in path.iterdir():
                 files_list.append(child_path)
+
+        # TODO: If a supplied path has a trailing slash, exception is thrown
 
         else:
             logging.critical("Somehow the path is neither file or directory")
@@ -64,7 +64,7 @@ def get_paths_list(supplied_path_list: list) -> list:
             exit("EXIT: Error with supplied path")
 
     logging.debug(f"Following list with paths was created: \n{files_list}\n")
-    logging.debug(f"Following list with paths was created: \n{chr(10).join(map(str, files_list))}\n")
+    # logging.info(f"Following list with paths was created: \n{chr(10).join(map(str, files_list))}\n")
 
     return files_list
 
@@ -77,11 +77,14 @@ def open_file_list(files_list: list) -> dict:
     msg_dict = {}  # declare empty dict which will be returned by this function
 
     for path in files_list:  # loop over the whole list with filepaths
-        filename = path.name()  # get the file name
+        logging.debug(f"Working on the list item {path.name}")
+        filename = path.name  # get the file name
         filecontent = open_message(path)  # call the function to open file at supplied path
         msg_dict[filename] = filecontent  # create new item in dict, key being filename and value being the content
 
-    logging.debug(f"Following dict with filecontents was created: \n{chr(10).join(map(str, files_list))}\n")
+    logging.debug(f"Following dict keys are present in the created dict: \n{msg_dict.keys()}\n")
+    # logging.debug(f"Following dict with filecontents was created: \n{msg_dict}\n")
+    # logging.debug(f"Following dict with filecontents was created: \n{chr(10).join(map(str, msg_dict))}\n")
 
     return msg_dict
 
