@@ -37,11 +37,12 @@ def get_paths_list(supplied_path_list: list) -> list:
             logging.debug(f"Appending the following path to the list:\n {p} \n")
             path_list.append(p)  # append the newly created Path to the path list
 
-        logging.debug(f"Following list with paths was created: \n{path_list}\n")
-        # logging.debug(f"Following list with paths was created: \n{chr(10).join(map(str, path_list))}\n")
+        logging.debug(f"Following list with paths was read from supplied arguments: \n{path_list}\n")
+        logging.info(f"Following list with paths was read from supplied arguments: \n{chr(10).join(map(str, path_list))}\n")
 
         logging.debug(f"Checking if the paths are files or directories")
 
+    logging.info("Extracting file paths from directories")
     for path in path_list:
         path = path.resolve()
 
@@ -54,8 +55,6 @@ def get_paths_list(supplied_path_list: list) -> list:
             for child_path in path.iterdir():
                 files_list.append(child_path)
 
-        # TODO: If a supplied path has a trailing slash, exception is thrown
-
         else:
             logging.critical("Somehow the path is neither file or directory")
             logging.critical(f"Please check the path '{path}' and try again")
@@ -63,8 +62,8 @@ def get_paths_list(supplied_path_list: list) -> list:
             logging.critical(f"The file info: {pathstat}")
             exit("EXIT: Error with supplied path")
 
-    logging.debug(f"Following list with paths was created: \n{files_list}\n")
-    # logging.info(f"Following list with paths was created: \n{chr(10).join(map(str, files_list))}\n")
+    logging.debug(f"Following list with files was created: \n{files_list}\n")
+    logging.info(f"Following list with files was created: \n{chr(10).join(map(str, files_list))}\n")
 
     return files_list
 
@@ -83,6 +82,7 @@ def open_file_list(files_list: list) -> dict:
         msg_dict[filename] = filecontent  # create new item in dict, key being filename and value being the content
 
     logging.debug(f"Following dict keys are present in the created dict: \n{msg_dict.keys()}\n")
+    logging.info(f"Following files were read and will be sent to the api: \n{chr(10).join(map(str, msg_dict.keys()))}\n")
     # logging.debug(f"Following dict with filecontents was created: \n{msg_dict}\n")
     # logging.debug(f"Following dict with filecontents was created: \n{chr(10).join(map(str, msg_dict))}\n")
 
