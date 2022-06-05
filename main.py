@@ -16,8 +16,6 @@ DEFAULT_API_KEY = dev_defaults.API_KEY  # the key should be loaded from envvar #
 DEFAULT_API_PROMPT = "Determine if this email is a phishing email:\n\n"
 
 
-
-
 def get_paths_list(supplied_path_list: list) -> list:
     # This function transforms the user supplied paths strings into Path() objects from pathlib.
     # The function returns a list with those objects
@@ -34,7 +32,9 @@ def get_paths_list(supplied_path_list: list) -> list:
     if len(supplied_path_list) >= 1:
         logging.debug(f"The following list of path objects is being appended {path_list} (it should be empty here)")
         for i in supplied_path_list:  # loop over the whole list
+            i = i.strip('"')
             p = Path(i)  # create Path object from one item in list
+            logging.debug(f"Appending the following path to the list:\n {p} \n")
             path_list.append(p)  # append the newly created Path to the path list
 
         logging.debug(f"Following list with paths was created: \n{path_list}\n")
@@ -105,15 +105,17 @@ def open_message(textfile) -> str:
 
 def api_calls_on_dict(msg_dict: dict, base_api_prompt: str) -> dict:
     logging.debug(f"Called function '{api_calls_on_dict.__name__}'")
-    logging.debug(f"First parameter is: '{msg_dict}'")
+    # logging.debug(f"First parameter is: '{msg_dict}'")
+    logging.debug(f"First parameter is a dictionary with the keys: '{msg_dict.keys()}'")
     logging.debug(f"Second parameter is: '{base_api_prompt}'")
 
     api_result_dict = {}  # declare empty dict which will be returned by this function
 
     for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
-        response = api_call_completion(base_api_prompt,
-                                       value)  # get the api_call with the base_api_prompt and the value of the call
+        response = api_call_completion_endpoint(base_api_prompt,
+                                                value)  # get the api_call with the base_api_prompt and the value of the call
         api_result_dict[key] = response  # create new item in dict, that stores the response of the call
+        logging.debug(f"The API call for {key} finished")
 
     return api_result_dict
 
@@ -146,8 +148,8 @@ def api_response_get_text(response) -> str:
     return response['choices'][0]['text']
 
 
-def api_call_completion(prompt: str, msg_input: str):
-    logging.debug(f"Called function '{api_call_completion.__name__}'")
+def api_call_completion_endpoint(prompt: str, msg_input: str):
+    logging.debug(f"Called function '{api_call_completion_endpoint.__name__}'")
     logging.debug(f"First parameter is: '{prompt}'")
     logging.debug(f"Second parameter is: '{msg_input}'")
 
@@ -208,7 +210,7 @@ def main():
     # END of args handling          #############################################
 
     logging.info("Starting...")
-    logging.debug(f"The path supplied is: {type(options.path)}")
+    logging.debug(f"The path supplied is type: {type(options.path)}")
 
     # msg_to_check = get_paths_list(options.path)
     # if print_text:
