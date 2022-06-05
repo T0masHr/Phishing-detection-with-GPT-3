@@ -42,7 +42,7 @@ def get_paths_list(supplied_path_list: list) -> list:
         logging.debug(f"Following list with paths was created: \n{chr(10).join(map(str, path_list))}\n")
 
     # TODO: check if a path is a folder path, if it is get all files in the folder and return paths to single files
-    # TODO: after this isimplemented, this function should return a list of all filepaths
+    # TODO: after this implemented, this function should return a list of all filepaths
     for i in path_list:
         if i.is_file():
             logging.debug(f"The path '{i}' is a file path")
@@ -54,14 +54,29 @@ def get_paths_list(supplied_path_list: list) -> list:
 
     return files_list
 
+def callapi_on_list(files_list: list, base_api_prompt: str):
 
-def open_path(path_list: list):
-    # TODO
-    path = Path(supplied_path)
-    logging.info(f"Using the following path:  {path} \n")
+    # TODO: funktion, 1. param liste mit pfaden - files_list
+    #  - 2. param - basisanfrage an die API - base_api_prompt
+    #  Dann geht die funktion die ganze liste durch und führt fuer jedes item die api anfrage durch
+    #  - Ergebnisse in einer Liste speichern
 
-    msg_to_check = open_message(path)  # call the function to open file at supplied path
-    return msg_to_check
+
+def open_file_list(files_list: list) -> dict:
+    logging.debug(f"Called function '{open_file_list.__name__}' and using '{files_list}' as its parameter")
+    # This function opens all text files from the supplied path list and saves the contents of the files n a
+    # dictionary where the key is the filename and the value the file content
+
+    msg_list = {}
+
+    for path in files_list:
+        filename = path.name()
+        filecontent = open_message(path)  # call the function to open file at supplied path
+        msg_list[filename] = filecontent
+
+    logging.debug(f"Following dict with filecontents was created: \n{chr(10).join(map(str, msg_list))}\n")
+
+    return msg_list
 
 
 def open_message(textfile) -> str:
@@ -83,7 +98,7 @@ def api_response_get_text(response) -> str:
     return response['choices'][0]['text']
 
 
-def api_call_completion(prompt, msg_input):
+def api_call_completion(prompt: str, msg_input: str):
     logging.debug(f"Called function '{api_call_completion.__name__}'")
     logging.debug(f"First parameter is: '{prompt}'")
     logging.debug(f"Second parameter is: '{msg_input}'")
