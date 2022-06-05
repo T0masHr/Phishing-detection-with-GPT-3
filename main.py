@@ -1,3 +1,4 @@
+import json
 import logging
 import argparse
 import sys
@@ -12,6 +13,7 @@ from email.message import EmailMessage
 import dev_defaults
 
 DEFAULT_PATH = dev_defaults.DEFAULT_PATH
+DEFAULT_JSON_CONFIG = dev_defaults.DEFAULT_JSON_CONFIG
 DEFAULT_API_KEY = dev_defaults.API_KEY  # the key should be loaded from envvar # os.getenv("OPENAI_API_KEY")
 DEFAULT_API_PROMPT = "Determine if this email is a phishing email:\n\n"
 
@@ -38,7 +40,8 @@ def get_paths_list(supplied_path_list: list) -> list:
             path_list.append(p)  # append the newly created Path to the path list
 
         logging.debug(f"Following list with paths was read from supplied arguments: \n{path_list}\n")
-        logging.info(f"Following list with paths was read from supplied arguments: \n{chr(10).join(map(str, path_list))}\n")
+        logging.info(
+            f"Following list with paths was read from supplied arguments: \n{chr(10).join(map(str, path_list))}\n")
 
         logging.debug(f"Checking if the paths are files or directories")
 
@@ -82,7 +85,8 @@ def open_file_list(files_list: list) -> dict:
         msg_dict[filename] = filecontent  # create new item in dict, key being filename and value being the content
 
     logging.debug(f"Following dict keys are present in the created dict: \n{msg_dict.keys()}\n")
-    logging.info(f"Following files were read and will be sent to the api: \n{chr(10).join(map(str, msg_dict.keys()))}\n")
+    logging.info(
+        f"Following files were read and will be sent to the api: \n{chr(10).join(map(str, msg_dict.keys()))}\n")
     # logging.debug(f"Following dict with filecontents was created: \n{msg_dict}\n")
     # logging.debug(f"Following dict with filecontents was created: \n{chr(10).join(map(str, msg_dict))}\n")
 
@@ -103,7 +107,45 @@ def open_message(textfile) -> str:
         exit("Path was not found")
 
 
-def api_calls_on_dict(msg_dict: dict, base_api_prompt: str) -> dict:
+def parse_api_json_config(configfile):
+    logging.debug(f"Called function '{parse_api_json_config.__name__}'")
+    logging.debug(f"First parameter is: '{configfile}'")
+    # this function loads the configuration for the api call
+    f = open(configfile)
+    config = json.load(f)
+    logging.debug(f"The following json config was loaded: {config}")
+    return config
+
+
+def api_call_completion_endpoint(config: dict, prompt: str, msg_input: str):
+    logging.debug(f"Called function '{api_call_completion_endpoint.__name__}'")
+    logging.debug(f"First parameter is: '{prompt}'")
+    logging.debug(f"Second parameter is: '{msg_input}'")
+
+    # call to the openai web api with the supplied email text body as input
+    # response = openai.Completion.create(
+    #     engine="text-davinci-002",
+    #     prompt=prompt + msg_input,
+    #     temperature=0.1,
+    #     max_tokens=256,
+    #     top_p=1,
+    #     frequency_penalty=0,
+    #     presence_penalty=0
+    # )
+
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=config["prompt"] + msg_input,
+        temperature=config["temperature"],
+        max_tokens=config["max_tokens"],
+        top_p=config["top_p"],
+        frequency_penalty=config["frequency_penalty"],
+        presence_penalty=config["presence_penalty"]
+    )
+    return response
+
+
+def api_calls_on_dict(config: dict, msg_dict: dict, base_api_prompt: str) -> dict:
     logging.debug(f"Called function '{api_calls_on_dict.__name__}'")
     # logging.debug(f"First parameter is: '{msg_dict}'")
     logging.debug(f"First parameter is a dictionary with the keys: '{msg_dict.keys()}'")
@@ -112,7 +154,7 @@ def api_calls_on_dict(msg_dict: dict, base_api_prompt: str) -> dict:
     api_result_dict = {}  # declare empty dict which will be returned by this function
 
     for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
-        response = api_call_completion_endpoint(base_api_prompt,
+        response = api_call_completion_endpoint(config, base_api_prompt,
                                                 value)  # get the api_call with the base_api_prompt and the value of the call
         api_result_dict[key] = response  # create new item in dict, that stores the response of the call
         logging.debug(f"The API call for {key} finished")
@@ -148,24 +190,6 @@ def api_response_get_text(response) -> str:
     return response['choices'][0]['text']
 
 
-def api_call_completion_endpoint(prompt: str, msg_input: str):
-    logging.debug(f"Called function '{api_call_completion_endpoint.__name__}'")
-    logging.debug(f"First parameter is: '{prompt}'")
-    logging.debug(f"Second parameter is: '{msg_input}'")
-
-    # call to the openai web api with the supplied email text body as input
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt + msg_input,
-        temperature=0.1,
-        max_tokens=256,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )
-    return response
-
-
 def setup_logging(verbosity_level):
     base_loglevel = 30  # base value is only to display warning messages
     verbosity_level = min(verbosity_level, 2)
@@ -194,6 +218,9 @@ def main():
                         help="Do not reflect the supplied text back in console")
     parser.add_argument("--api_prompt", nargs="?", default=DEFAULT_API_PROMPT,
                         help=f"Change the base API prompt, otherwise the following prompt is used: '{DEFAULT_API_PROMPT}'")
+    parser.add_argument("--json_config", nargs="?", default=DEFAULT_JSON_CONFIG,
+                        help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
+
     # parser.add_argument("--chatbot", action="store_true", help="switch to chatbot mode")
     options = parser.parse_args()
     setup_logging(options.verbosity_level)  # call the function to set up logging with provided verbosity level
@@ -201,15 +228,23 @@ def main():
     if options.api_key is DEFAULT_API_KEY:
         logging.info("No api_key supplied, using the default key")
 
+    if options.json_config is DEFAULT_JSON_CONFIG:
+        logging.info(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
+
     if options.path is DEFAULT_PATH:
         logging.info(f"No path supplied, using the default path: '{DEFAULT_PATH}'")
 
     openai.api_key = options.api_key
+    json_config = options.json_config
     print_text = options.print_text
 
     # END of args handling          #############################################
 
     logging.info("Starting...")
+
+    api_config = parse_api_json_config(json_config)
+    base_api_prompt = DEFAULT_API_PROMPT
+
     logging.debug(f"The path supplied is type: {type(options.path)}")
 
     # msg_to_check = get_paths_list(options.path)
@@ -217,14 +252,14 @@ def main():
     #     logging.info("Opening message completed, following text was read: \n")
     #     print(msg_to_check)  # print the text back to user
 
-    messages_dict = open_file_list(get_paths_list(options.path))
-
-    base_api_prompt = DEFAULT_API_PROMPT
+    messages_dict = open_file_list(get_paths_list(options.path))  # see longtext below
+    """" convert the user supplied arguments in options.path into a list of path objects. Then open all files in this 
+    list and return a dictionary with the filename as a key and the contents a the value - this is the messages_dict"""
 
     if options.enable_api:
         logging.info("Api call is active")
 
-        api_responses_dict = api_calls_on_dict(messages_dict, base_api_prompt)
+        api_responses_dict = api_calls_on_dict(api_config, messages_dict, base_api_prompt)
         api_text_responses = get_text_from_response_dict(api_responses_dict)
         prettyprint_api_text_response_dict(base_api_prompt, api_text_responses)
 
