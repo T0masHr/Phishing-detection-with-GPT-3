@@ -214,12 +214,9 @@ def main():
                         help="enable the call to openai api")
     parser.add_argument("--api_key", default=DEFAULT_API_KEY,
                         help="API_KEY for openai, by default the environment variable OPENAI_API_KEY is used")
-    # parser.add_argument("--api_prompt", nargs="?", default=DEFAULT_API_PROMPT,
-    #                     help=f"Change the base API prompt, otherwise the following prompt is used: '{DEFAULT_API_PROMPT}'")
     parser.add_argument("--json_config", default=DEFAULT_JSON_CONFIG,
                         help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
 
-    # parser.add_argument("--chatbot", action="store_true", help="switch to chatbot mode")
     options = parser.parse_args()
     setup_logging(options.verbosity_level)  # call the function to set up logging with provided verbosity level
 
