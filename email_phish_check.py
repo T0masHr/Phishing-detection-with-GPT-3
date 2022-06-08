@@ -7,8 +7,8 @@ from pprint import pformat
 from pathlib import Path
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
-DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")
-DEFAULT_API_PROMPT = "Determine if this email is a phishing email:\n\n"
+DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")  # should never be exposed, can be specified with arg '--api_key'
+
 
 def get_paths_list(supplied_path_list: list) -> list:
     # This function transforms the user supplied paths strings into Path() objects from pathlib.
