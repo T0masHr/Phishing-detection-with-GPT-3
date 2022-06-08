@@ -87,8 +87,7 @@ def open_file_list(files_list: list) -> dict:
         msg_dict[filename] = filecontent  # create new item in dict, key being filename and value being the content
 
     logging.debug(f"Following dict keys are present in the created dict: \n{msg_dict.keys()}\n")
-    logging.info(
-        f"Following files were read and will be sent to the api: \n{chr(10).join(map(str, msg_dict.keys()))}\n")
+    logging.info(f"Following files were read: \n{chr(10).join(map(str, msg_dict.keys()))}\n")
     # logging.debug(f"Following dict with filecontents was created: \n{msg_dict}\n")
     # logging.debug(f"Following dict with filecontents was created: \n{chr(10).join(map(str, msg_dict))}\n")
 
@@ -115,7 +114,7 @@ def parse_api_json_config(configfile):
     # this function loads the configuration for the api call
     f = open(configfile)
     config = json.load(f)
-    logging.info(f"The following json config was loaded: \n {pformat(config)}\n")
+    logging.info(f"\nThe following json config was loaded: \n {pformat(config)}\n")
     return config
 
 
@@ -212,17 +211,17 @@ def setup_logging(verbosity_level):
 def main():
     # command line arguments handling:
     parser = argparse.ArgumentParser()
-    parser.add_argument("path", nargs="*", default=DEFAULT_PATH,
-                        help="Path to single or multiple message files")
+    parser.add_argument("path", nargs="+", help="Path to single or multiple message files; If a directory path is "
+                                                "provided all files in the directory are extracted and analysed")
     parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
     parser.add_argument("--enable_api", action="store_true",
                         help="enable the call to openai api")
     parser.add_argument("--api_key", default=DEFAULT_API_KEY,
                         help="API_KEY for openai, by default the environment variable OPENAI_API_KEY is used")
-    parser.add_argument("--api_prompt", nargs="?", default=DEFAULT_API_PROMPT,
-                        help=f"Change the base API prompt, otherwise the following prompt is used: '{DEFAULT_API_PROMPT}'")
-    parser.add_argument("--json_config", nargs="?", default=DEFAULT_JSON_CONFIG,
+    # parser.add_argument("--api_prompt", nargs="?", default=DEFAULT_API_PROMPT,
+    #                     help=f"Change the base API prompt, otherwise the following prompt is used: '{DEFAULT_API_PROMPT}'")
+    parser.add_argument("--json_config", default=DEFAULT_JSON_CONFIG,
                         help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
 
     # parser.add_argument("--chatbot", action="store_true", help="switch to chatbot mode")
@@ -230,33 +229,33 @@ def main():
     setup_logging(options.verbosity_level)  # call the function to set up logging with provided verbosity level
 
     if options.api_key is DEFAULT_API_KEY:
-        logging.info("No api_key supplied, using the default key")
+        print("No api_key supplied, using the key from environment variable")
+        print(f"Using key '************************************************{options.api_key[-3:]}'")
 
     if options.json_config is DEFAULT_JSON_CONFIG:
-        logging.info(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
+        print(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
 
     if options.path is DEFAULT_PATH:
         logging.info(f"No path supplied, using the default path: '{DEFAULT_PATH}'")
 
     openai.api_key = options.api_key
     json_config = options.json_config
-
     # END of args handling          #############################################
 
     logging.info("Starting...")
 
     api_config = parse_api_json_config(json_config)
-
-    # base_api_prompt = DEFAULT_API_PROMPT
+    print(f"\nThe following json config was loaded: \n {pformat(api_config)}\n")
 
     logging.debug(f"The path supplied is type: {type(options.path)}")
 
-    messages_dict = open_file_list(get_paths_list(options.path))  # see longtext below
-    """" convert the user supplied arguments in options.path into a list of path objects. Then open all files in this 
-    list and return a dictionary with the filename as a key and the contents a the value - this is the messages_dict"""
+    messages_dict = open_file_list(get_paths_list(options.path))  # convert the user supplied arguments in
+    # options.path into a list of path objects. Then open all files in this list and return a dictionary with the
+    # filename as a key and the contents a the value - this is the messages_dict
+    print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
 
     if options.enable_api:
-        logging.info("Api call is active")
+        print("Api call is active")
 
         api_responses_dict = api_calls_on_dict(api_config, messages_dict)
         api_text_responses = get_text_from_response_dict(api_responses_dict)
