@@ -214,33 +214,33 @@ def main():
     parser.add_argument("--json_config", default=DEFAULT_JSON_CONFIG,
                         help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
 
-    options = parser.parse_args()
-    setup_logging(options.verbosity_level)  # call the function to set up logging with provided verbosity level
+    args = parser.parse_args()
+    setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
 
-    if options.api_key is DEFAULT_API_KEY:
+    if args.api_key is DEFAULT_API_KEY:
         print("No api_key supplied, using the key from environment variable")
-        print(f"Using key '************************************************{options.api_key[-3:]}'")
+        print(f"Using key '************************************************{args.api_key[-3:]}'")
 
-    if options.json_config is DEFAULT_JSON_CONFIG:
+    if args.json_config is DEFAULT_JSON_CONFIG:
         print(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
 
-    openai.api_key = options.api_key
-    json_config = options.json_config
+    openai.api_key = args.api_key
+    api_config = parse_api_json_config(args.json_config)
+    print(f"\nThe following json config was loaded: \n {pformat(api_config)}\n")
+
     # END of args handling          #############################################
 
     logging.info("Starting...")
 
-    api_config = parse_api_json_config(json_config)
-    print(f"\nThe following json config was loaded: \n {pformat(api_config)}\n")
+    logging.debug(f"The path supplied is type: {type(args.path)}")
 
-    logging.debug(f"The path supplied is type: {type(options.path)}")
-
-    messages_dict = open_file_list(get_paths_list(options.path))  # convert the user supplied arguments in
-    # options.path into a list of path objects. Then open all files in this list and return a dictionary with the
-    # filename as a key and the contents a the value - this is the messages_dict
+    print("Extracting provided paths...\n")
+    messages_dict = open_file_list(get_paths_list(args.path))  # convert the user supplied arguments in
+    # args.path into a list of path objects. Then open all files in this list and return a dictionary with the
+    # filename as a key and the contents s the value - this is the messages_dict
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
 
-    if options.enable_api:
+    if args.enable_api:
         print("Api call is active")
         print("...")
         api_responses_dict = api_calls_on_dict(api_config, messages_dict)
