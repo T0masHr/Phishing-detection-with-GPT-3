@@ -1,6 +1,6 @@
 {
   "prompt": "Determine if this email is a phishing email:\n\n",
-  "temperature": 0.01,
+  "temperature": 0,
   "max_tokens": 256,
   "top_p": 1,
   "frequency_penalty": 0,

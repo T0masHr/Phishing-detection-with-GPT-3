@@ -1,6 +1,7 @@
 import json
 import logging
 import argparse
+import os
 import sys
 from pprint import pformat
 
@@ -13,9 +14,9 @@ import chatbot  # import file with chatbot functions
 from email.message import EmailMessage
 import dev_defaults
 
-DEFAULT_PATH = dev_defaults.DEFAULT_PATH
-DEFAULT_JSON_CONFIG = dev_defaults.DEFAULT_JSON_CONFIG
-DEFAULT_API_KEY = dev_defaults.API_KEY  # the key should be loaded from envvar # os.getenv("OPENAI_API_KEY")
+DEFAULT_PATH = [r"emailMessages\placeholderMessage.txt"]
+DEFAULT_JSON_CONFIG = "apiprompt.json"
+DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")
 DEFAULT_API_PROMPT = "Determine if this email is a phishing email:\n\n"
 
 
@@ -105,7 +106,7 @@ def open_message(textfile) -> str:
             return text_from_file
     except FileNotFoundError:
         logging.critical(f"!!! THE FILE {textfile} WAS NOT FOUND, ABORTING EXECUTION !!!")
-        exit("Path was not found")
+        exit("EXIT: Path was not found")
 
 
 def parse_api_json_config(configfile):
@@ -133,16 +134,20 @@ def api_call_completion_endpoint(config: dict, msg_input: str):
     #     frequency_penalty=0,
     #     presence_penalty=0
     # )
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-002",
+            prompt=config["prompt"] + msg_input,
+            temperature=config["temperature"],
+            max_tokens=config["max_tokens"],
+            top_p=config["top_p"],
+            frequency_penalty=config["frequency_penalty"],
+            presence_penalty=config["presence_penalty"]
+        )
+    except openai.error.AuthenticationError as e:
+        logging.critical(f"OPEN AI AUTHENTICATION ERROR: {e}")
+        exit("EXIT: Openai authentication error")
 
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=config["prompt"] + msg_input,
-        temperature=config["temperature"],
-        max_tokens=config["max_tokens"],
-        top_p=config["top_p"],
-        frequency_penalty=config["frequency_penalty"],
-        presence_penalty=config["presence_penalty"]
-    )
     return response
 
 
