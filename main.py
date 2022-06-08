@@ -2,17 +2,10 @@ import json
 import logging
 import argparse
 import os
-import sys
-from pprint import pformat
-
 import openai
+from pprint import pformat
 from pathlib import Path
 
-import chatbot  # import file with chatbot functions
-# import os
-# Import the email modules we'll need
-from email.message import EmailMessage
-import dev_defaults
 
 DEFAULT_PATH = [r"emailMessages\placeholderMessage.txt"]
 DEFAULT_JSON_CONFIG = "apiprompt.json"
