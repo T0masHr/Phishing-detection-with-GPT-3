@@ -6,12 +6,9 @@ import openai
 from pprint import pformat
 from pathlib import Path
 
-
-DEFAULT_PATH = [r"emailMessages\placeholderMessage.txt"]
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")
 DEFAULT_API_PROMPT = "Determine if this email is a phishing email:\n\n"
-
 
 def get_paths_list(supplied_path_list: list) -> list:
     # This function transforms the user supplied paths strings into Path() objects from pathlib.
@@ -226,9 +223,6 @@ def main():
 
     if options.json_config is DEFAULT_JSON_CONFIG:
         print(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
-
-    if options.path is DEFAULT_PATH:
-        logging.info(f"No path supplied, using the default path: '{DEFAULT_PATH}'")
 
     openai.api_key = options.api_key
     json_config = options.json_config
