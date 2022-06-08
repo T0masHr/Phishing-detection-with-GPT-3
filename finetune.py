@@ -7,12 +7,13 @@ import jsonlines
 from email_phish_check import *  # import all functions from main file
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
+DEFAULT_OUTPUT_FILE = "nogit/output.jsonl"
 
 
-def craft_jsonl(prompt: str, msg_list: dict, desired_output: str):
+def craft_jsonl(output_file: str, prompt: str, msg_list: dict, desired_output: str):
     # {"prompt": "<prompt text>", "completion": "<ideal generated text>"}
     # "prompt": "Determine if this email is a phishing email:\n",
-    with jsonlines.open('output.jsonl', mode='w') as writer:
+    with jsonlines.open(output_file, mode='w') as writer:
         for value in msg_list.values():
             writer.write({"prompt": prompt + value, "completion": desired_output})
 
@@ -29,6 +30,8 @@ def main():
                         help="enable the call to openai api")
     parser.add_argument("--json_config", default=DEFAULT_JSON_CONFIG,
                         help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
+    parser.add_argument("-o", "--output_file", default=DEFAULT_OUTPUT_FILE,
+                        help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_OUTPUT_FILE}'")
 
     args = parser.parse_args()
     setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
@@ -40,9 +43,14 @@ def main():
     if args.json_config is DEFAULT_JSON_CONFIG:
         print(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
 
+    if args.output_file is DEFAULT_OUTPUT_FILE:
+        print(f"No output file supplied, using the default '{DEFAULT_OUTPUT_FILE}'")
+
     openai.api_key = args.api_key
     api_config = parse_api_json_config(args.json_config)
     print(f"\nThe following json config was loaded: \n {pformat(api_config)}\n")
+    output_file = args.output_file
+    print(f"Output to: '{output_file}")
 
     # END of args handling          #############################################
 
@@ -52,7 +60,7 @@ def main():
     # filename as a key and the contents s the value - this is the messages_dict
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
 
-    craft_jsonl(api_config["prompt"], messages_dict, 'This email is not a phishing email.')
+    craft_jsonl(output_file, api_config["prompt"], messages_dict, 'This email is not a phishing email.')
 
     if args.enable_api:
         print("Api call is active")
