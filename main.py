@@ -183,11 +183,13 @@ def prettyprint_api_text_response_dict(used_api_prompt: str, api_result_text_dic
     # this function prints all the api response to given files
     logging.debug(
         f"Called function '{prettyprint_api_text_response_dict.__name__}' and using '{api_result_text_dict}' as its parameter")
+    prompt_without_linebreak = used_api_prompt.strip("\n")
 
-    print(f"Using the prompt '{used_api_prompt}'")
-    print("API response:")
+    print(f"The textual promt for the API was: '{prompt_without_linebreak}' and the API responded with:")
     for key, value in api_result_text_dict.items():
-        print(f"For the file {key} the API responded with {value} \n")
+        value = value.strip("\n")
+        # print(f"For the file {key} the API responded with: '{value}'")
+        print(f"{key} -> '{value}'")
 
 
 def api_response_get_text(response) -> str:
@@ -200,9 +202,9 @@ def setup_logging(verbosity_level):
     verbosity_level = min(verbosity_level, 2)
     loglevel = base_loglevel - (verbosity_level * 10)  # loglevel goes from 10 to 50, intervals of 10
     # logging.DEBUG = 10; logging.CRITICAL = 50
-    FORMAT = "[%(asctime)s %(filename)s->%(funcName)s():%(lineno)s]%(levelname)s: %(message)s"
+    custom_format = "[%(asctime)s %(filename)s->%(funcName)s():%(lineno)s]%(levelname)s: %(message)s"
     if loglevel == 10:
-        logging.basicConfig(level=loglevel, format=FORMAT)
+        logging.basicConfig(level=loglevel, format=custom_format)
     if loglevel >= 20:
         logging.basicConfig(level=loglevel, format='%(levelname)s:%(message)s')
 
@@ -256,9 +258,11 @@ def main():
 
     if options.enable_api:
         print("Api call is active")
-
+        print("...")
         api_responses_dict = api_calls_on_dict(api_config, messages_dict)
+        print("...")
         api_text_responses = get_text_from_response_dict(api_responses_dict)
+        print("...")
         prettyprint_api_text_response_dict(api_config["prompt"], api_text_responses)
 
     else:
