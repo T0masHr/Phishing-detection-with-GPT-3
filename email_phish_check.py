@@ -89,7 +89,7 @@ def open_message(textfile) -> str:
     # Open the plain text file whose name is in textfile for reading.
 
     try:
-        with open(textfile) as fp:
+        with open(textfile, encoding='UTF-8') as fp:
             # Create a text/plain message
             text_from_file = f'''{fp.read()}'''
             return text_from_file
