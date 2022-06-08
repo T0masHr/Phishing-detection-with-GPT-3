@@ -214,14 +214,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("path", nargs="*", default=DEFAULT_PATH,
                         help="Path to single or multiple message files")
-    parser.add_argument("--api_key", default=DEFAULT_API_KEY,
-                        help="API_KEY for openai")
     parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
     parser.add_argument("--enable_api", action="store_true",
                         help="enable the call to openai api")
-    parser.add_argument("--no_text", action="store_false", dest="print_text",
-                        help="Do not reflect the supplied text back in console")
+    parser.add_argument("--api_key", default=DEFAULT_API_KEY,
+                        help="API_KEY for openai, by default the environment variable OPENAI_API_KEY is used")
     parser.add_argument("--api_prompt", nargs="?", default=DEFAULT_API_PROMPT,
                         help=f"Change the base API prompt, otherwise the following prompt is used: '{DEFAULT_API_PROMPT}'")
     parser.add_argument("--json_config", nargs="?", default=DEFAULT_JSON_CONFIG,
@@ -242,7 +240,6 @@ def main():
 
     openai.api_key = options.api_key
     json_config = options.json_config
-    print_text = options.print_text
 
     # END of args handling          #############################################
 
@@ -253,11 +250,6 @@ def main():
     # base_api_prompt = DEFAULT_API_PROMPT
 
     logging.debug(f"The path supplied is type: {type(options.path)}")
-
-    # msg_to_check = get_paths_list(options.path)
-    # if print_text:
-    #     logging.info("Opening message completed, following text was read: \n")
-    #     print(msg_to_check)  # print the text back to user
 
     messages_dict = open_file_list(get_paths_list(options.path))  # see longtext below
     """" convert the user supplied arguments in options.path into a list of path objects. Then open all files in this 
