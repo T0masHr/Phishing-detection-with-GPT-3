@@ -203,7 +203,7 @@ def setup_logging(verbosity_level):
 def main():
     # command line arguments handling:
     parser = argparse.ArgumentParser()
-    parser.add_argument("path", nargs="+", help="Path to single or multiple message files; If a directory path is "
+    parser.add_argument("path", nargs="+", help="path to single or multiple message files; If a directory path is "
                                                 "provided all files in the directory are extracted and analysed")
     parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
@@ -212,7 +212,7 @@ def main():
     parser.add_argument("--api_key", default=DEFAULT_API_KEY,
                         help="API_KEY for openai, by default the environment variable OPENAI_API_KEY is used")
     parser.add_argument("--json_config", default=DEFAULT_JSON_CONFIG,
-                        help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
+                        help=f"change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
 
     args = parser.parse_args()
     setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
@@ -241,6 +241,7 @@ def main():
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
 
     if args.enable_api:
+        # TODO: instead of having an extra argument, just ask the user if he wants to send the api call by "y/n"
         print("Api call is active")
         print("...")
         api_responses_dict = api_calls_on_dict(api_config, messages_dict)
