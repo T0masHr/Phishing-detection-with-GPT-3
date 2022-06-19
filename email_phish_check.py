@@ -2,6 +2,7 @@ import json
 import logging
 import argparse
 import os
+import sys
 
 import jsonlines
 import openai
@@ -116,7 +117,7 @@ def open_message(textfile) -> str:
         with open(textfile, encoding="utf-8", errors="ignore") as fp:
             # Create a text/plain message
             text_from_file = f'''{fp.read()}'''
-            edited_text = text_from_file.strip("\n") # strip all newlines, unknown if needed for the actual text
+            edited_text = text_from_file.strip("\n")  # strip all newlines, unknown if needed for the actual text
             # processing, but breaks the api response often
             return edited_text
     except FileNotFoundError:
@@ -239,6 +240,38 @@ def api_response_get_text(response) -> str:
     return response['choices'][0]['text']
 
 
+def query_yes_no(question, default="yes"):
+    """
+    Ask a yes/no question via raw_input() and return their answer.
+
+    :param question: String that is presented to the user.
+    :param default: The presumed answer if the user just hits <Enter>.
+            It must be "yes" (the default), "no" or None (meaning
+            an answer is required of the user).
+
+    :return: The "answer" return value is True for "yes" or False for "no".
+    """
+    # stolen from: https://stackoverflow.com/a/3041990
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == "":
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
+
 
 def setup_logging(verbosity_level):
     """
@@ -272,8 +305,6 @@ def main():
                                                 "provided all files in the directory are extracted and analysed")
     parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
-    parser.add_argument("--enable_api", action="store_true",
-                        help="enable the call to openai api")
     parser.add_argument("--api_key", default=DEFAULT_API_KEY,
                         help="API_KEY for openai, by default the environment variable OPENAI_API_KEY is used")
     parser.add_argument("--json_config", default=DEFAULT_JSON_CONFIG,
@@ -305,9 +336,10 @@ def main():
     # filename as a key and the contents s the value - this is the messages_dict
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
 
-    if args.enable_api:
-        # TODO: instead of having an extra argument, just ask the user if he wants to send the api call by "y/n"
-        print("Api call is active")
+    perform_call = query_yes_no("Follow with the actual API call? Watch the costs.")
+    if perform_call:
+
+        print("Api call is active, performing calls")
         print("...")
         api_responses_dict = api_calls_on_dict(api_config, messages_dict)
         print("...")
@@ -315,9 +347,8 @@ def main():
         print("...")
         prettyprint_api_text_response_dict(api_config["prompt"], api_text_responses)
 
-    else:
-        logging.info(f"The argument '--enable_api' was not supplied, no api call")
-        print("No actual api call performed to save credits. \n use argument '--enable_api' to use openai's api ")
+    elif not perform_call:
+        print("Answered no, the actually API calls will not be performed.")
 
 
 if __name__ == '__main__':
