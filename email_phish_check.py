@@ -2,6 +2,8 @@ import json
 import logging
 import argparse
 import os
+
+import jsonlines
 import openai
 from pprint import pformat
 from pathlib import Path
@@ -10,9 +12,20 @@ DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")  # should never be exposed, can be specified with arg '--api_key'
 
 
+# TODO: persistence for already evaluated files
+# TODO: write docstrings
+# TODO: instead of having an extra argument, just ask the user if he wants to send the api call by "y/n"
+# TODO: using regex strip all email adresses from the message
+
 def get_paths_list(supplied_path_list: list) -> list:
-    # This function transforms the user supplied paths strings into Path() objects from pathlib.
-    # The function returns a list with those objects
+    """
+    Transform the supplied paths strings into Path() objects from pathlib.
+    If the provided path is a directory, all files in that directory are extracted as single paths.
+
+    :param supplied_path_list: strings supplied by the user
+    :return: list with Path() objects
+    """
+
     logging.debug(f"Called function '{get_paths_list.__name__}'")
     logging.debug(f"Your list contains the following items:\n{chr(10).join(supplied_path_list)}\n")
     logging.debug(f"The parameter has the type {type(supplied_path_list)}")
@@ -64,9 +77,14 @@ def get_paths_list(supplied_path_list: list) -> list:
 
 
 def open_file_list(files_list: list) -> dict:
+    """
+    Open all text files from the supplied path list and save the file contents in a dictionary,
+    key being the filename and the value the file content.
+
+    :param files_list: list with Path objects
+    :return: Dictionary with content from loaded files
+    """
     logging.debug(f"Called function '{open_file_list.__name__}' and using '{files_list}' as its parameter")
-    # This function opens all text files from the supplied path list and saves the contents of the files n a
-    # dictionary where the key is the filename and the value the file content
 
     msg_dict = {}  # declare empty dict which will be returned by this function
 
@@ -85,20 +103,33 @@ def open_file_list(files_list: list) -> dict:
 
 
 def open_message(textfile) -> str:
+    """
+    Open the supplied textfile and return the contents.
+
+    :param textfile: the file to be opened
+    :return: filecontents, newlines are stripped
+    """
     logging.debug(f"Called function '{open_message.__name__}' and using '{textfile}' as its parameter")
     # Open the plain text file whose name is in textfile for reading.
 
     try:
-        with open(textfile, encoding='UTF-8') as fp:
+        with open(textfile, encoding="utf-8", errors="ignore") as fp:
             # Create a text/plain message
             text_from_file = f'''{fp.read()}'''
-            return text_from_file
+            edited_text = text_from_file.strip("\n") # strip all newlines, unknown if needed for the actual text
+            # processing, but breaks the api response often
+            return edited_text
     except FileNotFoundError:
         logging.critical(f"!!! THE FILE {textfile} WAS NOT FOUND, ABORTING EXECUTION !!!")
         exit("EXIT: Path was not found")
 
 
 def parse_api_json_config(configfile):
+    """
+    Parse the external JSON config file for the openai configuration.
+    :param configfile: path to the config file
+    :return: JSON form the config file parsed to dict
+    """
     logging.debug(f"Called function '{parse_api_json_config.__name__}'")
     logging.debug(f"First parameter is: '{configfile}'")
     # this function loads the configuration for the api call
@@ -109,20 +140,17 @@ def parse_api_json_config(configfile):
 
 
 def api_call_completion_endpoint(config: dict, msg_input: str):
+    """
+    Perform the actual api call to the 'completion' endpoint.
+    The parameter msg_input is appended to the 'prompt' specified in the config.
+    :param config: API configuration as dict loaded from JSON
+    :param msg_input: The actual message body to be analyzed.
+    :return: The API response.
+    """
     logging.debug(f"Called function '{api_call_completion_endpoint.__name__}'")
     logging.debug(f"First parameter is: '{config}'")
     logging.debug(f"Second parameter is: '{msg_input}'")
 
-    # call to the openai web api with the supplied email text body as input
-    # response = openai.Completion.create(
-    #     engine="text-davinci-002",
-    #     prompt=prompt + msg_input,
-    #     temperature=0.1,
-    #     max_tokens=256,
-    #     top_p=1,
-    #     frequency_penalty=0,
-    #     presence_penalty=0
-    # )
     try:
         response = openai.Completion.create(
             engine="text-davinci-002",
@@ -141,26 +169,37 @@ def api_call_completion_endpoint(config: dict, msg_input: str):
 
 
 def api_calls_on_dict(config: dict, msg_dict: dict) -> dict:
+    """
+    Perform multiple API calls, one call per key-value in the supplied dict.
+    :param config: API configuration as dict loaded from JSON.
+    :param msg_dict: Dictionary with messages to be analyzed.
+    :return: Dictionary with all api responses.
+    """
     logging.debug(f"Called function '{api_calls_on_dict.__name__}'")
     # logging.debug(f"First parameter is: '{msg_dict}'")
     logging.debug(f"First parameter is: '{config}'")
     logging.debug(f"Second parameter is a dictionary with the keys: '{msg_dict.keys()}'")
 
     api_result_dict = {}  # declare empty dict which will be returned by this function
-
-    for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
-        response = api_call_completion_endpoint(config,
-                                                value)  # get the api_call with the base_api_prompt and the value of the call
-        api_result_dict[key] = response  # create new item in dict, that stores the response of the call
-        logging.debug(f"The API call for {key} finished")
+    with jsonlines.open("nogit/response_log_test.jsonl", mode='w') as writer:
+        for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
+            response = api_call_completion_endpoint(config,
+                                                    value)  # get the api_call with the base_api_prompt and the value of the call
+            api_result_dict[key] = response  # create new item in dict, that stores the response of the call
+            writer.write({"file": key, "response text": api_response_get_text(response), "response json": response})
+            logging.debug(f"The API call for {key} finished")
 
     return api_result_dict
 
 
 def get_text_from_response_dict(api_result_dict: dict) -> dict:
+    """
+    Iterate over the given dictionary and extract only the actual response text from the api response.
+    Return the response texts in dict.
+    :param api_result_dict: Dict with the API JSON responses.
+    :return: Dict with the filename as key and the textual response as value.
+    """
     logging.debug(f"Called function '{get_text_from_response_dict.__name__}' without parameters.")
-    # this function iterates over the given dictionary and gets the actual response text from the api response
-    # return is a dictionary with the filename as key and the textual response as value
     api_result_text_dict = {}
 
     for key, value in api_result_dict.items():
@@ -170,24 +209,43 @@ def get_text_from_response_dict(api_result_dict: dict) -> dict:
 
 
 def prettyprint_api_text_response_dict(used_api_prompt: str, api_result_text_dict: dict):
+    """
+    Print the API responses from a dict with the corresponding initial prompt in a pretty way.
+    :param used_api_prompt: The base API prompt, should be loaded from the used JSON config.
+    :param api_result_text_dict: Dict with text extracted from the API responses.
+    :return: None
+    """
     # this function prints all the api response to given files
     logging.debug(
         f"Called function '{prettyprint_api_text_response_dict.__name__}' and using '{api_result_text_dict}' as its parameter")
     prompt_without_linebreak = used_api_prompt.strip("\n")
 
-    print(f"The textual promt for the API was: '{prompt_without_linebreak}' and the API responded with:")
+    print(f"The textual prompt for the API was: '{prompt_without_linebreak}' and the API responded with:")
     for key, value in api_result_text_dict.items():
         value = value.strip("\n")
         # print(f"For the file {key} the API responded with: '{value}'")
         print(f"{key} -> '{value}'")
 
+    return None
+
 
 def api_response_get_text(response) -> str:
+    """
+    Get the response text from the response JSON.
+    :param response: Response JSON.
+    :return: Extracted text.
+    """
     logging.debug(f"Called function '{api_response_get_text.__name__}' and using '{response}' as its parameter")
     return response['choices'][0]['text']
 
 
+
 def setup_logging(verbosity_level):
+    """
+    Configure the logging module used in this script.
+    :param verbosity_level:  Verbosity level is set with args.
+    :return: None
+    """
     base_loglevel = 30  # base value is only to display warning messages
     verbosity_level = min(verbosity_level, 2)
     loglevel = base_loglevel - (verbosity_level * 10)  # loglevel goes from 10 to 50, intervals of 10
@@ -201,6 +259,13 @@ def setup_logging(verbosity_level):
 
 #######################################################################################################################
 def main():
+    """
+    First the supplied arguments are handled.
+    Check if any default values are changed.
+    Load the API key to be able to communicate with OpenAI.
+    All the supplied paths are saved to a dictionary and opened.
+    :return: None
+    """
     # command line arguments handling:
     parser = argparse.ArgumentParser()
     parser.add_argument("path", nargs="+", help="path to single or multiple message files; If a directory path is "
