@@ -12,13 +12,11 @@ from pathlib import Path
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")  # should never be exposed, can be specified with arg '--api_key'
-EMAIL_REGEX = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
-
+EMAIL_REGEX = re.compile(
+    r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
 
 
 # TODO: persistence for already evaluated files
-# TODO: write docstrings
-# TODO: instead of having an extra argument, just ask the user if he wants to send the api call by "y/n"
 
 def get_paths_list(supplied_path_list: list) -> list:
     """
@@ -119,13 +117,21 @@ def open_message(textfile) -> str:
         with open(textfile, encoding="utf-8", errors="ignore") as fp:
             # Create a text/plain message
             text_from_file = f'''{fp.read()}'''
-            edited_text = text_from_file.strip("\n")  # strip all newlines, unknown if needed for the actual text
-            # processing, but breaks the api response often
-            edited_text = re.sub(EMAIL_REGEX, "[email_removed]", edited_text)
+            edited_text = custom_text_filter(text_from_file)
+
             return edited_text
     except FileNotFoundError:
         logging.critical(f"!!! THE FILE {textfile} WAS NOT FOUND, ABORTING EXECUTION !!!")
         exit("EXIT: Path was not found")
+
+
+def custom_text_filter(text: str) -> str:
+    filtered_text = text.replace("\n", "")
+    filtered_text = filtered_text.replace("﻿", " ")
+    filtered_text = filtered_text.replace(" ", " ")
+    filtered_text = filtered_text.replace("­", " ")
+    filtered_text = re.sub(EMAIL_REGEX, "[email_removed]", filtered_text)
+    return filtered_text
 
 
 def parse_api_json_config(configfile):

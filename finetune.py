@@ -10,7 +10,8 @@ from email_phish_check import *  # import all functions from main file
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_OUTPUT_FILE = "nogit/output.jsonl"
-EMAIL_REGEX = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
+EMAIL_REGEX = re.compile(
+    r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
 
 
 def craft_jsonl(output_file: str, prompt: str, msg_list: dict, desired_output: str):
@@ -27,9 +28,18 @@ def craft_jsonl(output_file: str, prompt: str, msg_list: dict, desired_output: s
     # "prompt": "Determine if this email is a phishing email:\n",
     with jsonlines.open(output_file, mode='w') as writer:
         for msg_text in msg_list.values():
-            msg_text = msg_text.replace("\n", "")
-            msg_text = re.sub(EMAIL_REGEX, "[email_removed]", msg_text)
+            msg_text = custom_text_filter(msg_text)
+
             writer.write({"prompt": prompt + msg_text, "completion": desired_output})
+
+
+def custom_text_filter(text: str) -> str:
+    filtered_text = text.replace("\n", "")
+    filtered_text = filtered_text.replace("﻿", " ")
+    filtered_text = filtered_text.replace(" ", " ")
+    filtered_text = filtered_text.replace("­", " ")
+    filtered_text = re.sub(EMAIL_REGEX, "[email_removed]", filtered_text)
+    return filtered_text
 
 
 def main():
