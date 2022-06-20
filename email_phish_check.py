@@ -2,6 +2,7 @@ import json
 import logging
 import argparse
 import os
+import re
 import sys
 
 import jsonlines
@@ -11,12 +12,13 @@ from pathlib import Path
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")  # should never be exposed, can be specified with arg '--api_key'
+EMAIL_REGEX = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
+
 
 
 # TODO: persistence for already evaluated files
 # TODO: write docstrings
 # TODO: instead of having an extra argument, just ask the user if he wants to send the api call by "y/n"
-# TODO: using regex strip all email adresses from the message
 
 def get_paths_list(supplied_path_list: list) -> list:
     """
@@ -119,6 +121,7 @@ def open_message(textfile) -> str:
             text_from_file = f'''{fp.read()}'''
             edited_text = text_from_file.strip("\n")  # strip all newlines, unknown if needed for the actual text
             # processing, but breaks the api response often
+            edited_text = re.sub(EMAIL_REGEX, "[email_removed]", edited_text)
             return edited_text
     except FileNotFoundError:
         logging.critical(f"!!! THE FILE {textfile} WAS NOT FOUND, ABORTING EXECUTION !!!")
@@ -240,7 +243,7 @@ def api_response_get_text(response) -> str:
     return response['choices'][0]['text']
 
 
-def query_yes_no(question, default="yes"):
+def query_yes_no(question, default="no"):
     """
     Ask a yes/no question via raw_input() and return their answer.
 
@@ -248,7 +251,6 @@ def query_yes_no(question, default="yes"):
     :param default: The presumed answer if the user just hits <Enter>.
             It must be "yes" (the default), "no" or None (meaning
             an answer is required of the user).
-
     :return: The "answer" return value is True for "yes" or False for "no".
     """
     # stolen from: https://stackoverflow.com/a/3041990
@@ -290,7 +292,6 @@ def setup_logging(verbosity_level):
         logging.basicConfig(level=loglevel, format='%(levelname)s:%(message)s')
 
 
-#######################################################################################################################
 def main():
     """
     First the supplied arguments are handled.
@@ -348,7 +349,7 @@ def main():
         prettyprint_api_text_response_dict(api_config["prompt"], api_text_responses)
 
     elif not perform_call:
-        print("Answered no, the actually API calls will not be performed.")
+        print("Answered no, the actual API calls will not be performed.")
 
 
 if __name__ == '__main__':

@@ -1,6 +1,8 @@
 import json
 import logging
 import argparse
+import re
+
 import openai
 import jsonlines
 
@@ -8,15 +10,26 @@ from email_phish_check import *  # import all functions from main file
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_OUTPUT_FILE = "nogit/output.jsonl"
+EMAIL_REGEX = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
 
 
 def craft_jsonl(output_file: str, prompt: str, msg_list: dict, desired_output: str):
-    # this function transforms the data in the jsonlines format needed by openai for finetuning
+    """
+    Transform the data in the jsonlines format needed by OpenAI for model fine tuning.
+    :param output_file:
+    :param prompt:
+    :param msg_list:
+    :param desired_output:
+    :return:
+    """
+    # this function
     # {"prompt": "<prompt text>", "completion": "<ideal generated text>"}
     # "prompt": "Determine if this email is a phishing email:\n",
     with jsonlines.open(output_file, mode='w') as writer:
-        for value in msg_list.values():
-            writer.write({"prompt": prompt + value, "completion": desired_output})
+        for msg_text in msg_list.values():
+            msg_text = msg_text.replace("\n", "")
+            msg_text = re.sub(EMAIL_REGEX, "[email_removed]", msg_text)
+            writer.write({"prompt": prompt + msg_text, "completion": desired_output})
 
 
 def main():
@@ -37,9 +50,9 @@ def main():
     args = parser.parse_args()
     setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
 
-    if args.api_key is DEFAULT_API_KEY:
-        print("No api_key supplied, using the key from environment variable")
-        print(f"Using key '************************************************{args.api_key[-3:]}'")
+    # if args.api_key is DEFAULT_API_KEY:
+    #     print("No api_key supplied, using the key from environment variable")
+    #     print(f"Using key '************************************************{args.api_key[-3:]}'")
 
     if args.json_config is DEFAULT_JSON_CONFIG:
         print(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
@@ -61,7 +74,7 @@ def main():
     # filename as a key and the contents s the value - this is the messages_dict
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
 
-    craft_jsonl(output_file, api_config["prompt"], messages_dict, 'This email is not a phishing email.')
+    craft_jsonl(output_file, api_config["prompt"], messages_dict, 'No')
 
     # if args.enable_api:
     #     print("Api call is active")
