@@ -1,0 +1,22 @@
+Welcome to Phishing detection with GPT-3’s documentation!
+*********************************************************
+
+
+Contents:
+^^^^^^^^^
+
+* Python
+
+  * email_phish_check module
+
+  * finetune module
+
+
+Indices and tables
+******************
+
+* Index
+
+* Module Index
+
+* Search Page

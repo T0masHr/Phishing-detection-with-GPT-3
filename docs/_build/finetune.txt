@@ -1,0 +1,30 @@
+finetune module
+***************
+
+finetune.craft_jsonl(output_file: str, prompt: str, msg_dict: dict, desired_output: str)
+
+   Transform the data in the jsonlines format needed by OpenAI for
+   model fine tuning. :param output_file: Path to file where output
+   will be saved.
+
+   Parameters:
+      * **prompt** – Baseline API prompt.
+
+      * **msg_dict** – Dictionary with loaded messages.
+
+      * **desired_output** – This is the desired answer from the API
+
+   Returns:
+      None
+
+finetune.custom_text_filter(text: str) -> str
+
+   All the filtering options applied to the message body.
+
+   Parameters:
+      **text** – Text to be filtered.
+
+   Returns:
+      Filtered text.
+
+finetune.main()
