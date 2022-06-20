@@ -198,8 +198,8 @@ def api_calls_on_dict(config: dict, msg_dict: dict) -> dict:
     api_result_dict = {}  # declare empty dict which will be returned by this function
     with jsonlines.open("nogit/response_log_test.jsonl", mode='w') as writer:
         for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
-            response = api_call_completion_endpoint(config,
-                                                    value)  # get the api_call with the base_api_prompt and the value of the call
+            response = api_call_completion_endpoint(config,value)
+            # get the api_call with the base_api_prompt and the value of the call
             api_result_dict[key] = response  # create new item in dict, that stores the response of the call
             writer.write({"file": key, "response text": api_response_get_text(response), "response json": response})
             logging.debug(f"The API call for {key} finished")
@@ -230,7 +230,7 @@ def prettyprint_api_text_response_dict(used_api_prompt: str, api_result_text_dic
     :param api_result_text_dict: Dict with text extracted from the API responses.
     :return: None
     """
-    # this function prints all the api response to given files
+
     logging.debug(
         f"Called function '{prettyprint_api_text_response_dict.__name__}' and using '{api_result_text_dict}' as its parameter")
     prompt_without_linebreak = used_api_prompt.strip("\n")
