@@ -14,30 +14,37 @@ EMAIL_REGEX = re.compile(
     r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
 
 
-def craft_jsonl(output_file: str, prompt: str, msg_list: dict, desired_output: str):
+def craft_jsonl(output_file: str, prompt: str, msg_dict: dict, desired_output: str):
     """
     Transform the data in the jsonlines format needed by OpenAI for model fine tuning.
-    :param output_file:
-    :param prompt:
-    :param msg_list:
-    :param desired_output:
-    :return:
+    :param output_file: Path to file where output will be saved.
+    :param prompt: Baseline API prompt.
+    :param msg_dict: Dictionary with loaded messages.
+    :param desired_output: This is the desired answer from the API
+    :return: None
     """
     # this function
     # {"prompt": "<prompt text>", "completion": "<ideal generated text>"}
     # "prompt": "Determine if this email is a phishing email:\n",
     with jsonlines.open(output_file, mode='w') as writer:
-        for msg_text in msg_list.values():
+        for msg_text in msg_dict.values():
             msg_text = custom_text_filter(msg_text)
 
             writer.write({"prompt": prompt + msg_text, "completion": desired_output})
 
+    return None
+
 
 def custom_text_filter(text: str) -> str:
+    """
+    All the filtering options applied to the message body.
+    :param text: Text to be filtered.
+    :return: Filtered text.
+    """
     filtered_text = text.replace("\n", "")
-    filtered_text = filtered_text.replace("﻿", " ")
-    filtered_text = filtered_text.replace(" ", " ")
-    filtered_text = filtered_text.replace("­", " ")
+    # filtered_text = filtered_text.replace("﻿", " ")
+    # filtered_text = filtered_text.replace(" ", " ")
+    # filtered_text = filtered_text.replace("­", " ")
     filtered_text = re.sub(EMAIL_REGEX, "[email_removed]", filtered_text)
     return filtered_text
 

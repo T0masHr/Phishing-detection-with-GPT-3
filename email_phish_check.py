@@ -126,10 +126,15 @@ def open_message(textfile) -> str:
 
 
 def custom_text_filter(text: str) -> str:
+    """
+    All the filtering options applied to the message body.
+    :param text: Text to be filtered.
+    :return: Filtered text.
+    """
     filtered_text = text.replace("\n", "")
-    filtered_text = filtered_text.replace("﻿", " ")
-    filtered_text = filtered_text.replace(" ", " ")
-    filtered_text = filtered_text.replace("­", " ")
+    # filtered_text = filtered_text.replace("﻿", " ")
+    # filtered_text = filtered_text.replace(" ", " ")
+    # filtered_text = filtered_text.replace("­", " ")
     filtered_text = re.sub(EMAIL_REGEX, "[email_removed]", filtered_text)
     return filtered_text
 
