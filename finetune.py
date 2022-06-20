@@ -18,6 +18,7 @@ def craft_jsonl(output_file: str, prompt: str, msg_dict: dict, desired_output: s
     """
     Transform the data in the jsonlines format needed by OpenAI for model fine tuning.
     :param output_file: Path to file where output will be saved.
+
     :param prompt: Baseline API prompt.
     :param msg_dict: Dictionary with loaded messages.
     :param desired_output: This is the desired answer from the API
@@ -38,6 +39,7 @@ def craft_jsonl(output_file: str, prompt: str, msg_dict: dict, desired_output: s
 def custom_text_filter(text: str) -> str:
     """
     All the filtering options applied to the message body.
+
     :param text: Text to be filtered.
     :return: Filtered text.
     """

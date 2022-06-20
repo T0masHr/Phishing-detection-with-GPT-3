@@ -128,6 +128,7 @@ def open_message(textfile) -> str:
 def custom_text_filter(text: str) -> str:
     """
     All the filtering options applied to the message body.
+
     :param text: Text to be filtered.
     :return: Filtered text.
     """
@@ -142,6 +143,7 @@ def custom_text_filter(text: str) -> str:
 def parse_api_json_config(configfile):
     """
     Parse the external JSON config file for the openai configuration.
+
     :param configfile: path to the config file
     :return: JSON form the config file parsed to dict
     """
@@ -158,6 +160,7 @@ def api_call_completion_endpoint(config: dict, msg_input: str):
     """
     Perform the actual api call to the 'completion' endpoint.
     The parameter msg_input is appended to the 'prompt' specified in the config.
+
     :param config: API configuration as dict loaded from JSON
     :param msg_input: The actual message body to be analyzed.
     :return: The API response.
@@ -186,6 +189,7 @@ def api_call_completion_endpoint(config: dict, msg_input: str):
 def api_calls_on_dict(config: dict, msg_dict: dict) -> dict:
     """
     Perform multiple API calls, one call per key-value in the supplied dict.
+
     :param config: API configuration as dict loaded from JSON.
     :param msg_dict: Dictionary with messages to be analyzed.
     :return: Dictionary with all api responses.
@@ -211,6 +215,7 @@ def get_text_from_response_dict(api_result_dict: dict) -> dict:
     """
     Iterate over the given dictionary and extract only the actual response text from the api response.
     Return the response texts in dict.
+
     :param api_result_dict: Dict with the API JSON responses.
     :return: Dict with the filename as key and the textual response as value.
     """
@@ -226,6 +231,7 @@ def get_text_from_response_dict(api_result_dict: dict) -> dict:
 def prettyprint_api_text_response_dict(used_api_prompt: str, api_result_text_dict: dict):
     """
     Print the API responses from a dict with the corresponding initial prompt in a pretty way.
+
     :param used_api_prompt: The base API prompt, should be loaded from the used JSON config.
     :param api_result_text_dict: Dict with text extracted from the API responses.
     :return: None
@@ -247,6 +253,7 @@ def prettyprint_api_text_response_dict(used_api_prompt: str, api_result_text_dic
 def api_response_get_text(response) -> str:
     """
     Get the response text from the response JSON.
+
     :param response: Response JSON.
     :return: Extracted text.
     """
