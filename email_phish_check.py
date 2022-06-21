@@ -17,6 +17,8 @@ EMAIL_REGEX = re.compile(
 
 
 # TODO: persistence for already evaluated files
+# TODO: ability to set expected result for each file (for multiple files based on source folder)
+# TODO: compare expected result with actual result
 
 def get_paths_list(supplied_path_list: list) -> list:
     """
@@ -111,7 +113,6 @@ def open_message(textfile) -> str:
     :return: filecontents, newlines are stripped
     """
     logging.debug(f"Called function '{open_message.__name__}' and using '{textfile}' as its parameter")
-    # Open the plain text file whose name is in textfile for reading.
 
     try:
         with open(textfile, encoding="utf-8", errors="ignore") as fp:
@@ -202,10 +203,10 @@ def api_calls_on_dict(config: dict, msg_dict: dict) -> dict:
     api_result_dict = {}  # declare empty dict which will be returned by this function
     with jsonlines.open("nogit/response_log_test.jsonl", mode='w') as writer:
         for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
-            response = api_call_completion_endpoint(config,value)
+            response = api_call_completion_endpoint(config, value)
             # get the api_call with the base_api_prompt and the value of the call
             api_result_dict[key] = response  # create new item in dict, that stores the response of the call
-            writer.write({"file": key, "response text": api_response_get_text(response), "response json": response})
+            writer.write({"file": key, "response_text": api_response_get_text(response), "response_json": response})
             logging.debug(f"The API call for {key} finished")
 
     return api_result_dict
