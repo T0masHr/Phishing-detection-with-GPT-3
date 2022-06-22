@@ -19,6 +19,81 @@ EMAIL_REGEX = re.compile(
 # TODO: persistence for already evaluated files
 # TODO: ability to set expected result for each file (for multiple files based on source folder)
 # TODO: compare expected result with actual result
+# TODO: argument to specify the response file
+
+def main():
+    """
+    This is where the main functionality of this script resides. First the user supplied arguments are handled,
+    such as the path to files or customized config file. By default, the OpenAI API key is loaded from an environment
+    variable but can be also set manually using the appropriate argument. For some attributes,such as the JSON
+    config, there are default values set. This external config is parsed to a dictionary.
+    After the arguments are handled, the actual execution follows.
+    At first, all the supplied paths which are loaded as a list are converted to Path() objects for better handling.
+    If a path points at a directory, it is converted to multiple paths to all files in the directory.
+    Afterwards all loaded files are opened and saved to a dictionary where the filename is the key and
+    the file contents the value.
+    The keys are printed to confirm with the user if he actually wants to send these files to the API.
+    This is done using the known [y/n] prompt.
+    If this is denied, the script terminates.
+    After confirming the prompt, all files are sent to the API one by one.
+    Each response is being logged to a file and also internally to a dictionary.
+    After all API calls are finished, the simplified dictionary with all responses is printed.
+
+    :return: None
+    """
+    # command line arguments handling:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("path", nargs="+", help="path to single or multiple message files; If a directory path is "
+                                                "provided all files in the directory are extracted and analysed")
+    parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
+                        help="set output verbosity: -v for INFO; -vv for DEBUG")
+    parser.add_argument("--api_key", default=DEFAULT_API_KEY,
+                        help="API_KEY for openai, by default the environment variable OPENAI_API_KEY is used")
+    parser.add_argument("--json_config", default=DEFAULT_JSON_CONFIG,
+                        help=f"change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
+
+    args = parser.parse_args()
+    setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
+
+    if args.api_key is DEFAULT_API_KEY:
+        print("No api_key supplied, using the key from environment variable")
+        try:
+            print(f"Using key '************************************************{args.api_key[-3:]}'")
+        except TypeError:
+            logging.error("No API key was loaded, it will not be possible to perform the API request")
+    if args.json_config is DEFAULT_JSON_CONFIG:
+        print(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
+
+    openai.api_key = args.api_key
+    api_config = parse_api_json_config(args.json_config)
+    print(f"\nThe following json config was loaded: \n {pformat(api_config)}\n")
+
+    # END of args handling          #############################################
+
+    logging.info("Starting...")
+
+    logging.debug(f"The path supplied is type: {type(args.path)}")
+
+    print("Extracting provided paths...\n")
+    messages_dict = open_file_list(get_paths_list(args.path))  # convert the user supplied arguments in
+    # args.path into a list of path objects. Then open all files in this list and return a dictionary with the
+    # filename as a key and the contents s the value - this is the messages_dict
+    print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
+
+    perform_call = query_yes_no("Follow with the actual API call? Watch the costs.")
+    if perform_call:
+
+        print("Api call is active, performing calls")
+        print("...")
+        api_responses_dict = api_calls_on_dict(api_config, messages_dict)
+        print("...")
+        api_text_responses = get_text_from_response_dict(api_responses_dict)
+        print("...")
+        prettyprint_api_text_response_dict(api_config["prompt"], api_text_responses)
+
+    elif not perform_call:
+        print("Answered no, the actual API calls will not be performed.")
+
 
 def get_paths_list(supplied_path_list: list) -> list:
     """
@@ -309,66 +384,6 @@ def setup_logging(verbosity_level):
         logging.basicConfig(level=loglevel, format=custom_format)
     if loglevel >= 20:
         logging.basicConfig(level=loglevel, format='%(levelname)s:%(message)s')
-
-
-def main():
-    """
-    First the supplied arguments are handled.
-    Check if any default values are changed.
-    Load the API key to be able to communicate with OpenAI.
-    All the supplied paths are saved to a dictionary and opened.
-    :return: None
-    """
-    # command line arguments handling:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("path", nargs="+", help="path to single or multiple message files; If a directory path is "
-                                                "provided all files in the directory are extracted and analysed")
-    parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
-                        help="set output verbosity: -v for INFO; -vv for DEBUG")
-    parser.add_argument("--api_key", default=DEFAULT_API_KEY,
-                        help="API_KEY for openai, by default the environment variable OPENAI_API_KEY is used")
-    parser.add_argument("--json_config", default=DEFAULT_JSON_CONFIG,
-                        help=f"change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
-
-    args = parser.parse_args()
-    setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
-
-    if args.api_key is DEFAULT_API_KEY:
-        print("No api_key supplied, using the key from environment variable")
-        print(f"Using key '************************************************{args.api_key[-3:]}'")
-
-    if args.json_config is DEFAULT_JSON_CONFIG:
-        print(f"No json config file supplied, using the default '{DEFAULT_JSON_CONFIG}'")
-
-    openai.api_key = args.api_key
-    api_config = parse_api_json_config(args.json_config)
-    print(f"\nThe following json config was loaded: \n {pformat(api_config)}\n")
-
-    # END of args handling          #############################################
-
-    logging.info("Starting...")
-
-    logging.debug(f"The path supplied is type: {type(args.path)}")
-
-    print("Extracting provided paths...\n")
-    messages_dict = open_file_list(get_paths_list(args.path))  # convert the user supplied arguments in
-    # args.path into a list of path objects. Then open all files in this list and return a dictionary with the
-    # filename as a key and the contents s the value - this is the messages_dict
-    print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
-
-    perform_call = query_yes_no("Follow with the actual API call? Watch the costs.")
-    if perform_call:
-
-        print("Api call is active, performing calls")
-        print("...")
-        api_responses_dict = api_calls_on_dict(api_config, messages_dict)
-        print("...")
-        api_text_responses = get_text_from_response_dict(api_responses_dict)
-        print("...")
-        prettyprint_api_text_response_dict(api_config["prompt"], api_text_responses)
-
-    elif not perform_call:
-        print("Answered no, the actual API calls will not be performed.")
 
 
 if __name__ == '__main__':

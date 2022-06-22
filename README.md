@@ -16,16 +16,16 @@ to actually send them to the OpenAI API, the argument "--enable_api" has to be s
 
 **email_phish_check.py** is the main script. Following arguments are available: 
 ```
-.\email_phish_check.py -h
-usage: email_phish_check.py [-h] [-v] [--enable_api] [--api_key API_KEY] [--json_config JSON_CONFIG] path [path ...]
+.\email_phish_check.py -h                                                                                                  
+usage: email_phish_check.py [-h] [-v] [--api_key API_KEY] [--json_config JSON_CONFIG] path [path ...]
 
 positional arguments:
-  path                  path to single or multiple message files; If a directory path is provided all files in the directory are extracted and analysed
+  path                  path to single or multiple message files; 
+                        If a directory path is provided all files in the directory are extracted and analysed
 
 options:
   -h, --help            show this help message and exit
   -v, --verbose         set output verbosity: -v for INFO; -vv for DEBUG
-  --enable_api          enable the call to openai api
   --api_key API_KEY     API_KEY for openai, by default the environment variable OPENAI_API_KEY is used
   --json_config JSON_CONFIG
                         change the used api config, by default the following configfile is used: 'apiprompt.json'
