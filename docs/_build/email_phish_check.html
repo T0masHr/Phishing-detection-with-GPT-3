@@ -42,13 +42,13 @@
 <dd><p>This is where the main functionality of this script resides. First the user supplied arguments are handled,
 such as the path to files or customized config file. By default, the OpenAI API key is loaded from an environment
 variable but can be also set manually using the appropriate argument. For some attributes,such as the JSON
-config, there are default values set. This external config is parsed to a dictionary.
-After the arguments are handled, the actual execution follows.
+config, there are default values set. This external config is parsed to a dictionary.</p>
+<p>After the arguments are handled, the actual execution follows.
 At first, all the supplied paths which are loaded as a list are converted to Path() objects for better handling.
 If a path points at a directory, it is converted to multiple paths to all files in the directory.
 Afterwards all loaded files are opened and saved to a dictionary where the filename is the key and
-the file contents the value.
-The keys are printed to confirm with the user if he actually wants to send these files to the API.
+the file contents the value.</p>
+<p>The keys are printed to confirm with the user if he actually wants to send these files to the API.
 This is done using the known [y/n] prompt.
 If this is denied, the script terminates.
 After confirming the prompt, all files are sent to the API one by one.

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Welcome to Phishing detection with GPT-3’s documentation! &#8212; Phishing detection with GPT-3  documentation</title>
+    <title>Phishing detection with GPT-3 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -16,7 +16,6 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Python" href="modules.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -36,14 +35,260 @@
   <section id="welcome-to-phishing-detection-with-gpt-3-s-documentation">
 <h1>Welcome to Phishing detection with GPT-3’s documentation!<a class="headerlink" href="#welcome-to-phishing-detection-with-gpt-3-s-documentation" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Python</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="email_phish_check.html">email_phish_check module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="finetune.html">finetune module</a></li>
+<span id="document-modules"></span><section id="python">
+<h2>Python<a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<span id="document-email_phish_check"></span><section id="module-email_phish_check">
+<span id="email-phish-check-module"></span><h3>email_phish_check module<a class="headerlink" href="#module-email_phish_check" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.main">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#email_phish_check.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is where the main functionality of this script resides. First the user supplied arguments are handled,
+such as the path to files or customized config file. By default, the OpenAI API key is loaded from an environment
+variable but can be also set manually using the appropriate argument. For some attributes,such as the JSON
+config, there are default values set. This external config is parsed to a dictionary.</p>
+<p>After the arguments are handled, the actual execution follows.
+At first, all the supplied paths which are loaded as a list are converted to Path() objects for better handling.
+If a path points at a directory, it is converted to multiple paths to all files in the directory.
+Afterwards all loaded files are opened and saved to a dictionary where the filename is the key and
+the file contents the value.</p>
+<p>The keys are printed to confirm with the user if he actually wants to send these files to the API.
+This is done using the known [y/n] prompt.
+If this is denied, the script terminates.
+After confirming the prompt, all files are sent to the API one by one.
+Each response is being logged to a file and also internally to a dictionary.
+After all API calls are finished, the simplified dictionary with all responses is printed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.get_paths_list">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">get_paths_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">supplied_path_list</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#email_phish_check.get_paths_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the supplied paths strings into Path() objects from pathlib.
+If the provided path is a directory, all files in that directory are extracted as single paths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>supplied_path_list</strong> – strings supplied by the user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list with Path() objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.open_file_list">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">open_file_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files_list</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#email_phish_check.open_file_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open all text files from the supplied path list and save the file contents in a dictionary,
+key being the filename and the value the file content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>files_list</strong> – list with Path objects</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with content from loaded files</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.open_message">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">open_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">textfile</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#email_phish_check.open_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the supplied textfile and return the contents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>textfile</strong> – the file to be opened</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filecontents, newlines are stripped</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.custom_text_filter">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">custom_text_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#email_phish_check.custom_text_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>All the filtering options applied to the message body.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – Text to be filtered.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered text.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.parse_api_json_config">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">parse_api_json_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#email_phish_check.parse_api_json_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the external JSON config file for the openai configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>configfile</strong> – path to the config file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON form the config file parsed to dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.api_call_completion_endpoint">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">api_call_completion_endpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_input</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#email_phish_check.api_call_completion_endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the actual api call to the ‘completion’ endpoint.
+The parameter msg_input is appended to the ‘prompt’ specified in the config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – API configuration as dict loaded from JSON</p></li>
+<li><p><strong>msg_input</strong> – The actual message body to be analyzed.</p></li>
 </ul>
-</li>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The API response.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.api_calls_on_dict">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">api_calls_on_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#email_phish_check.api_calls_on_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform multiple API calls, one call per key-value in the supplied dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – API configuration as dict loaded from JSON.</p></li>
+<li><p><strong>msg_dict</strong> – Dictionary with messages to be analyzed.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with all api responses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.get_text_from_response_dict">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">get_text_from_response_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_result_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#email_phish_check.get_text_from_response_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over the given dictionary and extract only the actual response text from the api response.
+Return the response texts in dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>api_result_dict</strong> – Dict with the API JSON responses.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict with the filename as key and the textual response as value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.prettyprint_api_text_response_dict">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">prettyprint_api_text_response_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">used_api_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_result_text_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#email_phish_check.prettyprint_api_text_response_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the API responses from a dict with the corresponding initial prompt in a pretty way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>used_api_prompt</strong> – The base API prompt, should be loaded from the used JSON config.</p></li>
+<li><p><strong>api_result_text_dict</strong> – Dict with text extracted from the API responses.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.api_response_get_text">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">api_response_get_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#email_phish_check.api_response_get_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the response text from the response JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>response</strong> – Response JSON.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Extracted text.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.query_yes_no">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">query_yes_no</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#email_phish_check.query_yes_no" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask a yes/no question via raw_input() and return their answer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> – String that is presented to the user.</p></li>
+<li><p><strong>default</strong> – The presumed answer if the user just hits &lt;Enter&gt;.
+It must be “yes” (the default), “no” or None (meaning
+an answer is required of the user).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The “answer” return value is True for “yes” or False for “no”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.setup_logging">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity_level</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#email_phish_check.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the logging module used in this script.
+:param verbosity_level:  Verbosity level is set with args.
+:return: None</p>
+</dd></dl>
+
+</section>
+<span id="document-finetune"></span><section id="module-finetune">
+<span id="finetune-module"></span><h3>finetune module<a class="headerlink" href="#module-finetune" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="finetune.craft_jsonl">
+<span class="sig-prename descclassname"><span class="pre">finetune.</span></span><span class="sig-name descname"><span class="pre">craft_jsonl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_output</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#finetune.craft_jsonl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the data in the jsonlines format needed by OpenAI for model fine tuning.
+:param output_file: Path to file where output will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt</strong> – Baseline API prompt.</p></li>
+<li><p><strong>msg_dict</strong> – Dictionary with loaded messages.</p></li>
+<li><p><strong>desired_output</strong> – This is the desired answer from the API</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finetune.custom_text_filter">
+<span class="sig-prename descclassname"><span class="pre">finetune.</span></span><span class="sig-name descname"><span class="pre">custom_text_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#finetune.custom_text_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>All the filtering options applied to the message body.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – Text to be filtered.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered text.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finetune.main">
+<span class="sig-prename descclassname"><span class="pre">finetune.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#finetune.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</div>
+</section>
 </div>
 </section>
 <section id="indices-and-tables">
@@ -74,27 +319,16 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-modules">Python</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="modules.html" title="next chapter">Python</a></li>
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -114,9 +348,6 @@
       Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
-      |
-      <a href="_sources/index.rst.txt"
-          rel="nofollow">Page source</a>
     </div>
 
     

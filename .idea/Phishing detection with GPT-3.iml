@@ -7,6 +7,9 @@
     <orderEntry type="jdk" jdkName="Python 3.10 (Python_project_Phishing_detection_with_GPT-3)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyDocumentationSettings">
+    <option name="renderExternalDocumentation" value="true" />
+  </component>
   <component name="ReSTService">
     <option name="DOC_DIR" value="$MODULE_DIR$" />
   </component>
