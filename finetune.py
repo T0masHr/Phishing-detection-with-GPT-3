@@ -1,12 +1,5 @@
-import json
-import logging
-import argparse
-import re
-
-import openai
-import jsonlines
-
 from email_phish_check import *  # import all functions from main file
+from helpers import get_paths_list, open_file_list, custom_text_filter, setup_logging
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_OUTPUT_FILE = "nogit/output.jsonl"
@@ -52,6 +45,11 @@ def custom_text_filter(text: str) -> str:
 
 
 def main():
+    """
+    Creates the JSONL used for model finetuning.
+
+    :return:
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("path", nargs="+", help="Path to single or multiple message files; If a directory path is "
                                                 "provided all files in the directory are extracted and analysed")
