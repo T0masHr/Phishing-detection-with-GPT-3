@@ -1,8 +1,7 @@
-#  pip install -U scikit-learn
-from sklearn.metrics import *
+import jsonlines
+from sklearn.metrics import accuracy_score, precision_score, confusion_matrix
 
-y_pred = [0, 0, 1, 0]  # Values that the model returns
-y_true = [1, 0, 1, 0]  # Values we know that are correct
+DEFAULT_JSONL_DB = "nogit/messagesDB.jsonl"
 
 
 def print_evaluation(y_true: list, y_pred: list):
