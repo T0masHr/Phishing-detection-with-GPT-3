@@ -1,9 +1,12 @@
+import json
 import logging
 import re
 import sys
 from pathlib import Path
+from pprint import pformat
 
-from email_phish_check import EMAIL_REGEX
+EMAIL_REGEX = re.compile(
+    r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
 
 
 def get_paths_list(supplied_path_list: list) -> list:
@@ -174,3 +177,19 @@ def setup_logging(verbosity_level):
         logging.basicConfig(level=loglevel, format=custom_format)
     if loglevel >= 20:
         logging.basicConfig(level=loglevel, format='%(levelname)s:%(message)s')
+
+
+def parse_api_json_config(configfile):
+    """
+    Parse the external JSON config file for the openai configuration.
+
+    :param configfile: path to the config file
+    :return: JSON form the config file parsed to dict
+    """
+    logging.debug(f"Called function '{parse_api_json_config.__name__}'")
+    logging.debug(f"First parameter is: '{configfile}'")
+    # this function loads the configuration for the api call
+    f = open(configfile)
+    config = json.load(f)
+    logging.info(f"\nThe following json config was loaded: \n {pformat(config)}\n")
+    return config

@@ -1,9 +1,14 @@
-import helpers
-from email_phish_check import *  # import all functions from main file
-from helpers import get_paths_list, open_file_list, custom_text_filter, setup_logging, open_message
+import argparse
+import re
+from pprint import pformat
+
+from jsonlines import jsonlines
+
+from helpers import *
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
-DEFAULT_OUTPUT_FILE = "nogit/output.jsonl"
+DEFAULT_OUTPUT_FILE = "nogit/outputPhishing.jsonl"
+PHISHING_YES_NO = "Yes"
 EMAIL_REGEX = re.compile(
     r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
 
@@ -66,8 +71,6 @@ def main():
                         help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
     parser.add_argument("-o", "--output_file", default=DEFAULT_OUTPUT_FILE,
                         help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_OUTPUT_FILE}'")
-    parser.add_argument("-d", "--delim", action="store_true",
-                        help="If set the provided string is used as a delimiter to load multiple messages form one file")
 
     args = parser.parse_args()
     setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
@@ -100,10 +103,7 @@ def main():
     # filename as a key and the contents s the value - this is the messages_dict
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
 
-    if args.delim is not None:
-        print(f"Delimiter set, splitting files with following string: \n {args.delim}")
-
-    craft_jsonl(output_file, api_config["prompt"], messages_dict, 'No')
+    craft_jsonl(output_file, api_config["prompt"], messages_dict, PHISHING_YES_NO)
 
     # if args.enable_api:
     #     print("Api call is active")

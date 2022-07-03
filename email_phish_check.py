@@ -1,4 +1,3 @@
-import json
 import logging
 import argparse
 import os
@@ -8,12 +7,11 @@ import jsonlines
 import openai
 from pprint import pformat
 
-from helpers import get_paths_list, open_file_list, query_yes_no, setup_logging
+from helpers import get_paths_list, open_file_list, query_yes_no, setup_logging, parse_api_json_config
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")  # should never be exposed, can be specified with arg '--api_key'
-EMAIL_REGEX = re.compile(
-    r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
+
 
 
 # TODO: persistence for already evaluated files
@@ -95,22 +93,6 @@ def main():
 
     elif not perform_call:
         print("Answered no, the actual API calls will not be performed.")
-
-
-def parse_api_json_config(configfile):
-    """
-    Parse the external JSON config file for the openai configuration.
-
-    :param configfile: path to the config file
-    :return: JSON form the config file parsed to dict
-    """
-    logging.debug(f"Called function '{parse_api_json_config.__name__}'")
-    logging.debug(f"First parameter is: '{configfile}'")
-    # this function loads the configuration for the api call
-    f = open(configfile)
-    config = json.load(f)
-    logging.info(f"\nThe following json config was loaded: \n {pformat(config)}\n")
-    return config
 
 
 def api_call_completion_endpoint(config: dict, msg_input: str):
