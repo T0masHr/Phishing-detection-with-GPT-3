@@ -12,7 +12,7 @@ def Accuracy_Normalized (y_true: list, y_pred: list):
     return accuracy_calculated_normalized
 
 def Precision ( y_true : list, y_pred: list):
-    precisions_calcualted = precision_score(y_true, y_pred, average= none )
+    precisions_calcualted = precision_score(y_true, y_pred, average= None )
     return precisions_calcualted
 
 def Confusion_Matrix (y_true: list, y_pred:list):
