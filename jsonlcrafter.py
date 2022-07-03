@@ -24,7 +24,7 @@ def main():
                                                 "provided all files in the directory are extracted and analysed")
     parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
-    parser.add_argument("messageDB", nargs="?", default=DEFAULT_JSONL_DB,
+    parser.add_argument("messagesDB", nargs="?", default=DEFAULT_JSONL_DB,
                         help="path to the JSONL which stores all loaded messages ")
     args = parser.parse_args()
     setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
@@ -32,7 +32,7 @@ def main():
     # END of args handling          #############################################
 
     logging.info("Starting...")
-    db_path = args.messageDB
+    db_path = args.messagesDB
 
     print(f"The extracted files will be saved in '{db_path}'")
 

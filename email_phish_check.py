@@ -10,13 +10,12 @@ from pprint import pformat
 from helpers import get_paths_list, open_file_list, query_yes_no, setup_logging, parse_api_json_config
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
+DEFAULT_JSONL_DB = "nogit/messagesDB.jsonl"
 DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")  # should never be exposed, can be specified with arg '--api_key'
-
+DEFAULT_RESULTS_JSONL = "nogit/response_log_test.jsonl"
 
 
 # TODO: persistence for already evaluated files
-# TODO: ability to set expected result for each file (for multiple files based on source folder)
-# TODO: compare expected result with actual result
 # TODO: argument to specify the response file
 
 def main():
@@ -43,8 +42,9 @@ def main():
     """
     # command line arguments handling:
     parser = argparse.ArgumentParser()
-    parser.add_argument("path", nargs="+", help="path to single or multiple message files; If a directory path is "
-                                                "provided all files in the directory are extracted and analysed")
+    # parser.add_argument("path", nargs="+", help="path to single or multiple message files; If a directory path is "
+    #                                             "provided all files in the directory are extracted and analysed")
+    parser.add_argument("messagesDB", nargs="?", default=DEFAULT_JSONL_DB, help="path to the database JSONL file with prepared messages ")
     parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
     parser.add_argument("--api_key", default=DEFAULT_API_KEY,
@@ -72,12 +72,17 @@ def main():
 
     logging.info("Starting...")
 
-    logging.debug(f"The path supplied is type: {type(args.path)}")
+    # ----------------------------------------      
+    # logging.debug(f"The path supplied is type: {type(args.path)}")
+    #
+    # print("Extracting provided paths...\n")
+    # messages_dict = open_file_list(get_paths_list(args.path))  # convert the user supplied arguments in
+    # # args.path into a list of path objects. Then open all files in this list and return a dictionary with the
+    # # filename as a key and the contents s the value - this is the messages_dict
+    # ----------------------------------------      
+    db_path = args.messagesDB
+    messages_dict = open_messages_jsonl_db(db_path)
 
-    print("Extracting provided paths...\n")
-    messages_dict = open_file_list(get_paths_list(args.path))  # convert the user supplied arguments in
-    # args.path into a list of path objects. Then open all files in this list and return a dictionary with the
-    # filename as a key and the contents s the value - this is the messages_dict
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
 
     perform_call = query_yes_no("Follow with the actual API call? Watch the costs.")
@@ -85,7 +90,7 @@ def main():
 
         print("Api call is active, performing calls")
         print("...")
-        api_responses_dict = api_calls_on_dict(api_config, messages_dict)
+        api_responses_dict = api_calls_on_dict(api_config, messages_dict, db_path, DEFAULT_RESULTS_JSONL)
         print("...")
         api_text_responses = get_text_from_response_dict(api_responses_dict)
         print("...")
@@ -93,6 +98,27 @@ def main():
 
     elif not perform_call:
         print("Answered no, the actual API calls will not be performed.")
+
+
+def open_messages_jsonl_db(message_jsonl_db) -> dict:
+    msg_dict = {}  # declare empty dict which will be returned by this function
+    json_object_list = []
+
+    with jsonlines.open(message_jsonl_db, mode='r') as reader:
+        for obj in reader.iter(type=dict, skip_invalid=True):
+            json_object_list.append(obj)  # list of json objects loaded from file
+
+    for obj in json_object_list:  # loop over the whole list with filepaths
+        filename = obj["file"]
+        filecontent = obj["message_text"]  # call the function to open file at supplied path
+        msg_dict[filename] = filecontent  # create new item in dict, key being filename and value being the content
+
+    logging.debug(f"Following dict keys are present in the created dict: \n{msg_dict.keys()}\n")
+    logging.info(f"Following files were read: \n{chr(10).join(map(str, msg_dict.keys()))}\n")
+    # logging.debug(f"Following dict with filecontents was created: \n{msg_dict}\n")
+    # logging.debug(f"Following dict with filecontents was created: \n{chr(10).join(map(str, msg_dict))}\n")
+
+    return msg_dict
 
 
 def api_call_completion_endpoint(config: dict, msg_input: str):
@@ -125,7 +151,7 @@ def api_call_completion_endpoint(config: dict, msg_input: str):
     return response
 
 
-def api_calls_on_dict(config: dict, msg_dict: dict) -> dict:
+def api_calls_on_dict(config: dict, msg_dict: dict, msg_jsonl_db, results_db) -> dict:
     """
     Perform multiple API calls, one call per key-value in the supplied dict.
 
@@ -139,7 +165,25 @@ def api_calls_on_dict(config: dict, msg_dict: dict) -> dict:
     logging.debug(f"Second parameter is a dictionary with the keys: '{msg_dict.keys()}'")
 
     api_result_dict = {}  # declare empty dict which will be returned by this function
-    with jsonlines.open("nogit/response_log_test.jsonl", mode='w') as writer:
+    # with jsonlines.open(DEFAULT_RESULTS_JSONL, mode='w') as writer:
+    #     for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
+    #         response = api_call_completion_endpoint(config, value)
+    #         # get the api_call with the base_api_prompt and the value of the call
+    #         api_result_dict[key] = response  # create new item in dict, that stores the response of the call
+    #         writer.write({"file": key, "response_text": api_response_get_text(response), "response_json": response})
+    #         logging.debug(f"The API call for {key} finished")
+
+    with jsonlines.open(output_file, mode='r') as reader:
+        for obj in reader.iter(type=dict, skip_invalid=True):
+            lineslist.append(obj) # list of json objects loaded from file
+
+    with jsonlines.open(output_file, mode='w') as writer:
+        for item in lineslist:
+            writer.write(item) # maybe not even needed
+        for msg_key, msg_text in msg_dict.items():
+            writer.write({"file": msg_key, "phishing": desired_output, "api_result": None, "message_text": msg_text})
+
+    with jsonlines.open(DEFAULT_RESULTS_JSONL, mode='w') as writer:
         for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
             response = api_call_completion_endpoint(config, value)
             # get the api_call with the base_api_prompt and the value of the call

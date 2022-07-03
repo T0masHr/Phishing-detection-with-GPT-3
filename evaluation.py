@@ -4,6 +4,12 @@ from sklearn.metrics import accuracy_score, precision_score, confusion_matrix
 DEFAULT_JSONL_DB = "nogit/messagesDB.jsonl"
 
 
+def main():
+    expected_data = load_expected_data(DEFAULT_JSONL_DB)
+    predicted_data = load_predicted_data(DEFAULT_JSONL_DB)
+    print_evaluation(expected_data, predicted_data)
+
+
 def print_evaluation(y_true: list, y_pred: list):
     """
     Compare the two arguments and determine if the classification performed by the API was correct.
@@ -44,3 +50,7 @@ def load_predicted_data(path_to_file):
             api_result = obj["api_result"]
             api_result_list.append(api_result)
     return api_result_list
+
+
+if __name__ == '__main__':
+    main()
