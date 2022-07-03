@@ -1,5 +1,6 @@
+import helpers
 from email_phish_check import *  # import all functions from main file
-from helpers import get_paths_list, open_file_list, custom_text_filter, setup_logging
+from helpers import get_paths_list, open_file_list, custom_text_filter, setup_logging, open_message
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_OUTPUT_FILE = "nogit/output.jsonl"
@@ -43,6 +44,8 @@ def custom_text_filter(text: str) -> str:
     filtered_text = re.sub(EMAIL_REGEX, "[email_removed]", filtered_text)
     return filtered_text
 
+def extract_messages(file, delim_pattern):
+    open_message(file)
 
 def main():
     """
@@ -63,6 +66,8 @@ def main():
                         help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_JSON_CONFIG}'")
     parser.add_argument("-o", "--output_file", default=DEFAULT_OUTPUT_FILE,
                         help=f"Change the used api config, by default the following configfile is used: '{DEFAULT_OUTPUT_FILE}'")
+    parser.add_argument("-d", "--delim", action="store_true",
+                        help="If set the provided string is used as a delimiter to load multiple messages form one file")
 
     args = parser.parse_args()
     setup_logging(args.verbosity_level)  # call the function to set up logging with provided verbosity level
@@ -76,6 +81,9 @@ def main():
 
     if args.output_file is DEFAULT_OUTPUT_FILE:
         print(f"No output file supplied, using the default '{DEFAULT_OUTPUT_FILE}'")
+    if args.delim is not None:
+        prepared_pattern = f"(?sm){args.delim}(.+){args.delim}"
+        delimiter_regex = re.compile(prepared_pattern)
 
     # openai.api_key = args.api_key
     api_config = parse_api_json_config(args.json_config)
@@ -86,10 +94,14 @@ def main():
     # END of args handling          #############################################
 
     print("Extracting provided paths...\n")
-    messages_dict = open_file_list(get_paths_list(args.path))  # convert the user supplied arguments in
+    supplied_paths = get_paths_list(args.path)
+    messages_dict = open_file_list(supplied_paths)  # convert the user supplied arguments in
     # args.path into a list of path objects. Then open all files in this list and return a dictionary with the
     # filename as a key and the contents s the value - this is the messages_dict
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
+
+    if args.delim is not None:
+        print(f"Delimiter set, splitting files with following string: \n {args.delim}")
 
     craft_jsonl(output_file, api_config["prompt"], messages_dict, 'No')
 

@@ -11,5 +11,3 @@ def prediction_correct(expected_result, api_result):
     """
 
 
-
-def calculate_accuracy():
