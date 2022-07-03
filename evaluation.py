@@ -18,9 +18,13 @@ def print_evaluation(y_true: list, y_pred: list):
     :param y_pred: Classification of the message by the API.
     :return: print of the evaluation.
     """
+    print("Accuracy")
     print(accuracy_score(y_true, y_pred))
+    print("Accuracy not Normalized")
     print(accuracy_score(y_true, y_pred, normalize=False))
+    print("Precision")
     print(precision_score(y_true, y_pred, average=None))
+    print("Confusion Matrix")
     print(confusion_matrix(y_true, y_pred))
 
 
