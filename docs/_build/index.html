@@ -35,8 +35,8 @@
   <section id="welcome-to-phishing-detection-with-gpt-3-s-documentation">
 <h1>Welcome to Phishing detection with GPT-3’s documentation!<a class="headerlink" href="#welcome-to-phishing-detection-with-gpt-3-s-documentation" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
-<span id="document-modules"></span><section id="python">
-<h2>Python<a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h2>
+<span id="document-modules"></span><section id="python-project-phishing-detection-with-gpt-3">
+<h2>Python_project_Phishing_detection_with_GPT-3<a class="headerlink" href="#python-project-phishing-detection-with-gpt-3" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <span id="document-email_phish_check"></span><section id="module-email_phish_check">
 <span id="email-phish-check-module"></span><h3>email_phish_check module<a class="headerlink" href="#module-email_phish_check" title="Permalink to this heading">¶</a></h3>
@@ -175,6 +175,53 @@ Return the response texts in dict.</p>
 </dd></dl>
 
 </section>
+<span id="document-evaluation"></span><section id="module-evaluation">
+<span id="evaluation-module"></span><h3>evaluation module<a class="headerlink" href="#module-evaluation" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="evaluation.main">
+<span class="sig-prename descclassname"><span class="pre">evaluation.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#evaluation.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="evaluation.print_evaluation">
+<span class="sig-prename descclassname"><span class="pre">evaluation.</span></span><span class="sig-name descname"><span class="pre">print_evaluation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#evaluation.print_evaluation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare the two arguments and determine if the classification performed by the API was correct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_true</strong> – The correct classification of the email message.</p></li>
+<li><p><strong>y_pred</strong> – Classification of the message by the API.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>print of the evaluation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="evaluation.load_expected_data">
+<span class="sig-prename descclassname"><span class="pre">evaluation.</span></span><span class="sig-name descname"><span class="pre">load_expected_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_to_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#evaluation.load_expected_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crate a list of the expected outputs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path_to_file</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>expected_result_list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="evaluation.load_predicted_data">
+<span class="sig-prename descclassname"><span class="pre">evaluation.</span></span><span class="sig-name descname"><span class="pre">load_predicted_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_to_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#evaluation.load_predicted_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crate a list of the outputs that the API returned
+:param path_to_file:
+:return: api_result_list</p>
+</dd></dl>
+
+</section>
 <span id="document-finetune"></span><section id="module-finetune">
 <span id="finetune-module"></span><h3>finetune module<a class="headerlink" href="#module-finetune" title="Permalink to this heading">¶</a></h3>
 <dl class="py function">
@@ -211,17 +258,162 @@ Return the response texts in dict.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="finetune.extract_messages">
-<span class="sig-prename descclassname"><span class="pre">finetune.</span></span><span class="sig-name descname"><span class="pre">extract_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim_pattern</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#finetune.extract_messages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="finetune.main">
 <span class="sig-prename descclassname"><span class="pre">finetune.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#finetune.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Separate from the main program. This script generates the JSONL used for model finetuning.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<span id="document-helpers"></span><section id="module-helpers">
+<span id="helpers-module"></span><h3>helpers module<a class="headerlink" href="#module-helpers" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.get_paths_list">
+<span class="sig-prename descclassname"><span class="pre">helpers.</span></span><span class="sig-name descname"><span class="pre">get_paths_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">supplied_path_list</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#helpers.get_paths_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the supplied paths strings into Path() objects from pathlib.
+If the provided path is a directory, all files in that directory are extracted as single paths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>supplied_path_list</strong> – strings supplied by the user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list with Path() objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.open_file_list">
+<span class="sig-prename descclassname"><span class="pre">helpers.</span></span><span class="sig-name descname"><span class="pre">open_file_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files_list</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#helpers.open_file_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open all text files from the supplied path list and save the file contents in a dictionary,
+key being the filename and the value the file content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>files_list</strong> – list with Path objects</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with content from loaded files</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.open_message">
+<span class="sig-prename descclassname"><span class="pre">helpers.</span></span><span class="sig-name descname"><span class="pre">open_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">textfile</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#helpers.open_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the supplied textfile and return the contents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>textfile</strong> – the file to be opened</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filecontents, newlines are stripped</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.custom_text_filter">
+<span class="sig-prename descclassname"><span class="pre">helpers.</span></span><span class="sig-name descname"><span class="pre">custom_text_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#helpers.custom_text_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>All the filtering options applied to the message body.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – Text to be filtered.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered text.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.query_yes_no">
+<span class="sig-prename descclassname"><span class="pre">helpers.</span></span><span class="sig-name descname"><span class="pre">query_yes_no</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#helpers.query_yes_no" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask a yes/no question via raw_input() and return their answer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> – String that is presented to the user.</p></li>
+<li><p><strong>default</strong> – The presumed answer if the user just hits &lt;Enter&gt;.
+It must be “yes” (the default), “no” or None (meaning
+an answer is required of the user).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The “answer” return value is True for “yes” or False for “no”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.setup_logging">
+<span class="sig-prename descclassname"><span class="pre">helpers.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity_level</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the logging module used in this script.
+:param verbosity_level:  Verbosity level is set with args.
+:return: None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.parse_api_json_config">
+<span class="sig-prename descclassname"><span class="pre">helpers.</span></span><span class="sig-name descname"><span class="pre">parse_api_json_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.parse_api_json_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the external JSON config file for the openai configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>configfile</strong> – path to the config file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON form the config file parsed to dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<span id="document-jsonlcrafter"></span><section id="module-jsonlcrafter">
+<span id="jsonlcrafter-module"></span><h3>jsonlcrafter module<a class="headerlink" href="#module-jsonlcrafter" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="jsonlcrafter.main">
+<span class="sig-prename descclassname"><span class="pre">jsonlcrafter.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#jsonlcrafter.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is module is used to load (multiple) message files from a directory, assign the expected classification and
+append them to a JSONL file which is used in further processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jsonlcrafter.craft_jsonl">
+<span class="sig-prename descclassname"><span class="pre">jsonlcrafter.</span></span><span class="sig-name descname"><span class="pre">craft_jsonl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_output</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jsonlcrafter.craft_jsonl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the data in the jsonlines format needed by OpenAI for model fine tuning.
+:param output_file: Path to file where output will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt</strong> – Baseline API prompt.</p></li>
+<li><p><strong>msg_dict</strong> – Dictionary with loaded messages.</p></li>
+<li><p><strong>desired_output</strong> – This is the desired answer from the API</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jsonlcrafter.custom_text_filter">
+<span class="sig-prename descclassname"><span class="pre">jsonlcrafter.</span></span><span class="sig-name descname"><span class="pre">custom_text_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#jsonlcrafter.custom_text_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>All the filtering options applied to the message body.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – Text to be filtered.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered text.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -259,7 +451,7 @@ Return the response texts in dict.</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="index.html#document-modules">Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-modules">Python_project_Phishing_detection_with_GPT-3</a></li>
 </ul>
 
 <div class="relations">

@@ -85,7 +85,7 @@ def craft_jsonl(output_file: str, msg_dict: dict, desired_output: bool):
 def custom_text_filter(text: str) -> str:
     """
     All the filtering options applied to the message body.
-sign
+
     :param text: Text to be filtered.
     :return: Filtered text.
     """
