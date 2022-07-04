@@ -5,11 +5,17 @@ Welcome to Phishing detection with GPT-3’s documentation!
 Contents:
 ^^^^^^^^^
 
-* Python
+* Python_project_Phishing_detection_with_GPT-3
 
   * email_phish_check module
 
+  * evaluation module
+
   * finetune module
+
+  * helpers module
+
+  * jsonlcrafter module
 
 
 Indices and tables

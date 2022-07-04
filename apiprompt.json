@@ -1,5 +1,5 @@
 {
-  "model": "text-ada-001",
+  "model": "text-davinci-002",
   "prompt": "Determine if this email is a phishing email and answer with yes or no:\n",
   "temperature": 0,
   "max_tokens": 256,
