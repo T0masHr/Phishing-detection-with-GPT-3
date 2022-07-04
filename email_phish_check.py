@@ -7,16 +7,13 @@ import jsonlines
 import openai
 from pprint import pformat
 
-from helpers import get_paths_list, open_file_list, query_yes_no, setup_logging, parse_api_json_config
+from helpers import query_yes_no, setup_logging, parse_api_json_config
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
 DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")  # should never be exposed, can be specified with arg '--api_key'
 DEFAULT_JSONL_DB = "nogit/messagesDB.jsonl"
 DEFAULT_RESULTS_JSONL = "nogit/finalOutput.jsonl"
 
-
-# TODO: persistence for already evaluated files
-# TODO: argument to specify the response file
 
 def main():
     """
@@ -73,7 +70,7 @@ def main():
 
     logging.info("Starting...")
 
-    # ----------------------------------------      
+    # ----------------------------------------      legacy for path handling
     # logging.debug(f"The path supplied is type: {type(args.path)}")
     #
     # print("Extracting provided paths...\n")
@@ -102,6 +99,12 @@ def main():
 
 
 def open_messages_jsonl_db(message_jsonl_db) -> dict:
+    """
+    Load the messages from prepared JSONL file.
+
+    :param message_jsonl_db: Path to the file with prepared messages.
+    :return: Return the dictionary with filename as keys and file contents as values.
+    """
     msg_dict = {}  # declare empty dict which will be returned by this function
     json_object_list = []
 
@@ -173,7 +176,6 @@ def api_calls_on_dict(config: dict, msg_dict: dict, msg_jsonl_db, results_db) ->
     #         api_result_dict[key] = response  # create new item in dict, that stores the response of the call
     #         writer.write({"file": key, "response_text": api_response_get_text(response), "response_json": response})
     #         logging.debug(f"The API call for {key} finished")
-    prepared_file = []
 
     for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
         try:
@@ -199,23 +201,6 @@ def api_calls_on_dict(config: dict, msg_dict: dict, msg_jsonl_db, results_db) ->
                     logging.info(f"The file {file} matches and will be updated with the api result")
                     logging.info(f"")
                     writer.write({"file": file, "phishing": phishing, "api_result": bool_response, "response_json": response, "message_text": message_text})
-
-
-
-                # if obj["file"] == key:
-                #     obj["api_result"] = api_responded_text
-                #     obj["response_json"] = response
-                # writer.write(obj)
-
-    # with jsonlines.open(output_file, mode='r') as reader:
-    #     for obj in reader.iter(type=dict, skip_invalid=True):
-    #         lineslist.append(obj)  # list of json objects loaded from file
-    #
-    # with jsonlines.open(output_file, mode='w') as writer:
-    #     for item in lineslist:
-    #         writer.write(item)  # maybe not even needed
-    #     for msg_key, msg_text in msg_dict.items():
-    #         writer.write({"file": msg_key, "phishing": desired_output, "api_result": None, "message_text": msg_text})
 
     return api_result_dict
 
@@ -272,18 +257,11 @@ def api_response_get_text(response) -> str:
 
 def api_response_get_bool(responded_text: str) -> bool:
     """
-    Return true false based by the yes/no response from API
+    Return true false based by the yes/no response from API, determined using basic regex.
 
     :param responded_text: The API result which will be evalulated.
     :return: The "answer" return value is True for "yes" or False for "no".
     """
-    # valid = {"Yes": True, "yes": True, "y": True, "ye": True, "No": False, "no": False, "n": False , "This email is not a phishing email.": False}
-
-    # if responded_text in valid:
-    #     return valid[responded_text]
-    # else:
-    #     logging.critical("Unexpected api response text")
-
     if re.search("no", responded_text, re.IGNORECASE):
         return False
     elif re.search("yes", responded_text, re.IGNORECASE):

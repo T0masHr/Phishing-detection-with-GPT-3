@@ -33,6 +33,7 @@ def print_evaluation(y_true: list, y_pred: list):
 def load_expected_data(path_to_file):
     """
     Crate a list of the expected outputs
+
     :param path_to_file:
     :return: expected_result_list
     """

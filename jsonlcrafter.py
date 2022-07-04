@@ -1,6 +1,7 @@
 import argparse
 import logging
 import re
+import sys
 
 from jsonlines import jsonlines
 
@@ -66,11 +67,10 @@ def craft_jsonl(output_file: str, msg_dict: dict, desired_output: bool):
     """
 
     lineslist = []  # list of objects/lines from the JSONL
-    json_object = {}  # single json object represented by a dictionary
 
     with jsonlines.open(output_file, mode='r') as reader:
         for obj in reader.iter(type=dict, skip_invalid=True):
-            lineslist.append(obj) # list of json objects loaded from file
+            lineslist.append(obj)  # list of json objects loaded from file
     # the appending mode of open could b used insted
     with jsonlines.open(output_file, mode='w') as writer:
         for item in lineslist:
@@ -78,7 +78,6 @@ def craft_jsonl(output_file: str, msg_dict: dict, desired_output: bool):
         for msg_key, msg_text in msg_dict.items():
             # writer.write({"file": msg_key, "phishing": desired_output, "api_result": None, "message_text": msg_text})
             writer.write({"file": msg_key, "phishing": desired_output, "message_text": msg_text})
-
 
     return None
 
@@ -99,4 +98,4 @@ sign
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
