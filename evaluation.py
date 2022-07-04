@@ -1,5 +1,5 @@
 import jsonlines
-from sklearn.metrics import accuracy_score, precision_score, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, confusion_matrix,recall_score
 
 DEFAULT_JSONL_DB = "nogit/finalOutput.jsonl"
 
@@ -24,7 +24,9 @@ def print_evaluation(y_true: list, y_pred: list):
     print(accuracy_score(y_true, y_pred, normalize=False))
     print("Precision")
     print(precision_score(y_true, y_pred, average=None))
-    print("Confusion Matrix")
+    print("Recall")
+    print(recall_score(y_true,y_pred,average=None))
+    print("Confusion Matrix") # TODO: Mach mal hier bitte noch nne ausführliche erklärung, was die zeilen was die spalten der matrix bedeuten
     print(confusion_matrix(y_true, y_pred))
 
 
