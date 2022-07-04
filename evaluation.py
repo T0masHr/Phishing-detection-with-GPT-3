@@ -1,7 +1,7 @@
 import jsonlines
 from sklearn.metrics import accuracy_score, precision_score, confusion_matrix
 
-DEFAULT_JSONL_DB = "nogit/messagesDB.jsonl"
+DEFAULT_JSONL_DB = "nogit/finalOutput.jsonl"
 
 
 def main():

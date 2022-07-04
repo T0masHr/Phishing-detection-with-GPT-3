@@ -130,7 +130,7 @@ def custom_text_filter(text: str) -> str:
     return filtered_text
 
 
-def query_yes_no(question, default="no"):
+def query_yes_no(question: str, default="no") ->  bool:
     """
     Ask a yes/no question via raw_input() and return their answer.
 

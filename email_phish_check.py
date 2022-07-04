@@ -10,9 +10,9 @@ from pprint import pformat
 from helpers import get_paths_list, open_file_list, query_yes_no, setup_logging, parse_api_json_config
 
 DEFAULT_JSON_CONFIG = "apiprompt.json"
-DEFAULT_JSONL_DB = "nogit/messagesDB.jsonl"
 DEFAULT_API_KEY = os.getenv("OPENAI_API_KEY")  # should never be exposed, can be specified with arg '--api_key'
-DEFAULT_RESULTS_JSONL = "nogit/response_log_test.jsonl"
+DEFAULT_JSONL_DB = "nogit/messagesDB.jsonl"
+DEFAULT_RESULTS_JSONL = "nogit/finalOutput.jsonl"
 
 
 # TODO: persistence for already evaluated files
@@ -44,7 +44,8 @@ def main():
     parser = argparse.ArgumentParser()
     # parser.add_argument("path", nargs="+", help="path to single or multiple message files; If a directory path is "
     #                                             "provided all files in the directory are extracted and analysed")
-    parser.add_argument("messagesDB", nargs="?", default=DEFAULT_JSONL_DB, help="path to the database JSONL file with prepared messages ")
+    parser.add_argument("messagesDB", nargs="?", default=DEFAULT_JSONL_DB,
+                        help="path to the database JSONL file with prepared messages ")
     parser.add_argument("-v", "--verbose", action="count", default=0, dest="verbosity_level",
                         help="set output verbosity: -v for INFO; -vv for DEBUG")
     parser.add_argument("--api_key", default=DEFAULT_API_KEY,
@@ -84,7 +85,7 @@ def main():
     messages_dict = open_messages_jsonl_db(db_path)
 
     print(f"Following files were read: \n{chr(10).join(map(str, messages_dict.keys()))}\n")
-
+    print(f"There are {messages_dict.__len__()} loaded messages.")
     perform_call = query_yes_no("Follow with the actual API call? Watch the costs.")
     if perform_call:
 
@@ -161,8 +162,8 @@ def api_calls_on_dict(config: dict, msg_dict: dict, msg_jsonl_db, results_db) ->
     """
     logging.debug(f"Called function '{api_calls_on_dict.__name__}'")
     # logging.debug(f"First parameter is: '{msg_dict}'")
-    logging.debug(f"First parameter is: '{config}'")
-    logging.debug(f"Second parameter is a dictionary with the keys: '{msg_dict.keys()}'")
+    # logging.debug(f"First parameter is: '{config}'")
+    # logging.debug(f"Second parameter is a dictionary with the keys: '{msg_dict.keys()}'")
 
     api_result_dict = {}  # declare empty dict which will be returned by this function
     # with jsonlines.open(DEFAULT_RESULTS_JSONL, mode='w') as writer:
@@ -172,24 +173,49 @@ def api_calls_on_dict(config: dict, msg_dict: dict, msg_jsonl_db, results_db) ->
     #         api_result_dict[key] = response  # create new item in dict, that stores the response of the call
     #         writer.write({"file": key, "response_text": api_response_get_text(response), "response_json": response})
     #         logging.debug(f"The API call for {key} finished")
+    prepared_file = []
 
-    with jsonlines.open(output_file, mode='r') as reader:
-        for obj in reader.iter(type=dict, skip_invalid=True):
-            lineslist.append(obj) # list of json objects loaded from file
-
-    with jsonlines.open(output_file, mode='w') as writer:
-        for item in lineslist:
-            writer.write(item) # maybe not even needed
-        for msg_key, msg_text in msg_dict.items():
-            writer.write({"file": msg_key, "phishing": desired_output, "api_result": None, "message_text": msg_text})
-
-    with jsonlines.open(DEFAULT_RESULTS_JSONL, mode='w') as writer:
-        for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
+    for key, value in msg_dict.items():  # loop over the whole msg_list with key and value of the msg_list
+        try:
             response = api_call_completion_endpoint(config, value)
             # get the api_call with the base_api_prompt and the value of the call
             api_result_dict[key] = response  # create new item in dict, that stores the response of the call
-            writer.write({"file": key, "response_text": api_response_get_text(response), "response_json": response})
-            logging.debug(f"The API call for {key} finished")
+        except openai.error.RateLimitError as e:
+            logging.critical("API Rate limit reached, please send less than 60 requests per minute ")
+            logging.critical(e)
+            return api_result_dict
+
+        api_responded_text = api_response_get_text(response)
+        bool_response = api_response_get_bool(api_responded_text)
+        logging.info(f"The API call for {key} finished")
+
+        with jsonlines.open(msg_jsonl_db) as reader, jsonlines.open(results_db, mode='a') as writer:
+            for obj in reader.iter():
+                logging.debug(f"Reading Object {obj}")
+                file = obj["file"]
+                phishing = obj["phishing"]
+                message_text = obj["message_text"]
+                if file == key:
+                    logging.info(f"The file {file} matches and will be updated with the api result")
+                    logging.info(f"")
+                    writer.write({"file": file, "phishing": phishing, "api_result": bool_response, "response_json": response, "message_text": message_text})
+
+
+
+                # if obj["file"] == key:
+                #     obj["api_result"] = api_responded_text
+                #     obj["response_json"] = response
+                # writer.write(obj)
+
+    # with jsonlines.open(output_file, mode='r') as reader:
+    #     for obj in reader.iter(type=dict, skip_invalid=True):
+    #         lineslist.append(obj)  # list of json objects loaded from file
+    #
+    # with jsonlines.open(output_file, mode='w') as writer:
+    #     for item in lineslist:
+    #         writer.write(item)  # maybe not even needed
+    #     for msg_key, msg_text in msg_dict.items():
+    #         writer.write({"file": msg_key, "phishing": desired_output, "api_result": None, "message_text": msg_text})
 
     return api_result_dict
 
@@ -242,6 +268,28 @@ def api_response_get_text(response) -> str:
     """
     logging.debug(f"Called function '{api_response_get_text.__name__}' and using '{response}' as its parameter")
     return response['choices'][0]['text']
+
+
+def api_response_get_bool(responded_text: str) -> bool:
+    """
+    Return true false based by the yes/no response from API
+
+    :param responded_text: The API result which will be evalulated.
+    :return: The "answer" return value is True for "yes" or False for "no".
+    """
+    # valid = {"Yes": True, "yes": True, "y": True, "ye": True, "No": False, "no": False, "n": False , "This email is not a phishing email.": False}
+
+    # if responded_text in valid:
+    #     return valid[responded_text]
+    # else:
+    #     logging.critical("Unexpected api response text")
+
+    if re.search("no", responded_text, re.IGNORECASE):
+        return False
+    elif re.search("yes", responded_text, re.IGNORECASE):
+        return True
+    else:
+        logging.critical("Unexpected api response text")
 
 
 if __name__ == '__main__':

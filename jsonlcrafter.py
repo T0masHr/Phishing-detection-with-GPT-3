@@ -71,12 +71,14 @@ def craft_jsonl(output_file: str, msg_dict: dict, desired_output: bool):
     with jsonlines.open(output_file, mode='r') as reader:
         for obj in reader.iter(type=dict, skip_invalid=True):
             lineslist.append(obj) # list of json objects loaded from file
-
+    # the appending mode of open could b used insted
     with jsonlines.open(output_file, mode='w') as writer:
         for item in lineslist:
-            writer.write(item) # maybe not even needed
+            writer.write(item)
         for msg_key, msg_text in msg_dict.items():
-            writer.write({"file": msg_key, "phishing": desired_output, "api_result": None, "message_text": msg_text})
+            # writer.write({"file": msg_key, "phishing": desired_output, "api_result": None, "message_text": msg_text})
+            writer.write({"file": msg_key, "phishing": desired_output, "message_text": msg_text})
+
 
     return None
 
