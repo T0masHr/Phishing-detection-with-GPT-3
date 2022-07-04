@@ -1,7 +1,8 @@
 {
+  "model": "ada:ft-personal-2022-07-03-18-12-16",
   "prompt": "Determine if this email is a phishing email and answer with yes or no:\n",
   "temperature": 0,
-  "max_tokens": 256,
+  "max_tokens": 3,
   "top_p": 0,
   "frequency_penalty": 0,
   "presence_penalty": 0

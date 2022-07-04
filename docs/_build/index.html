@@ -68,7 +68,16 @@ After all API calls are finished, the simplified dictionary with all responses i
 <dl class="py function">
 <dt class="sig sig-object py" id="email_phish_check.open_messages_jsonl_db">
 <span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">open_messages_jsonl_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message_jsonl_db</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#email_phish_check.open_messages_jsonl_db" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Load the messages from prepared JSONL file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message_jsonl_db</strong> – Path to the file with prepared messages.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return the dictionary with filename as keys and file contents as values.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="email_phish_check.api_call_completion_endpoint">
@@ -151,6 +160,20 @@ Return the response texts in dict.</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="email_phish_check.api_response_get_bool">
+<span class="sig-prename descclassname"><span class="pre">email_phish_check.</span></span><span class="sig-name descname"><span class="pre">api_response_get_bool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">responded_text</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#email_phish_check.api_response_get_bool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true false based by the yes/no response from API, determined using basic regex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>responded_text</strong> – The API result which will be evalulated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The “answer” return value is True for “yes” or False for “no”.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <span id="document-finetune"></span><section id="module-finetune">
 <span id="finetune-module"></span><h3>finetune module<a class="headerlink" href="#module-finetune" title="Permalink to this heading">¶</a></h3>
@@ -195,7 +218,7 @@ Return the response texts in dict.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="finetune.main">
 <span class="sig-prename descclassname"><span class="pre">finetune.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#finetune.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates the JSONL used for model finetuning.</p>
+<dd><p>Separate from the main program. This script generates the JSONL used for model finetuning.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p>

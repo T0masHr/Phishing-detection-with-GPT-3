@@ -140,7 +140,7 @@ def api_call_completion_endpoint(config: dict, msg_input: str):
 
     try:
         response = openai.Completion.create(
-            engine="text-davinci-002",
+            model=config["model"],
             prompt=config["prompt"] + msg_input,
             temperature=config["temperature"],
             max_tokens=config["max_tokens"],

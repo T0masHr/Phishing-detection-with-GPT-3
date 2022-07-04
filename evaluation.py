@@ -26,7 +26,7 @@ def print_evaluation(y_true: list, y_pred: list):
     print(precision_score(y_true, y_pred, average=None))
     print("Recall")
     print(recall_score(y_true,y_pred,average=None))
-    print("Confusion Matrix") # TODO: Mach mal hier bitte noch nne ausführliche erklärung, was die zeilen was die spalten der matrix bedeuten
+    print("Confusion Matrix")
     print(confusion_matrix(y_true, y_pred))
 
 

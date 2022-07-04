@@ -50,10 +50,6 @@ def custom_text_filter(text: str) -> str:
     return filtered_text
 
 
-def extract_messages(file, delim_pattern):
-    open_message(file)
-
-
 def main():
     """
     Separate from the main program. This script generates the JSONL used for model finetuning.
