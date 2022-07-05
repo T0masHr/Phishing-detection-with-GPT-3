@@ -216,9 +216,15 @@ Return the response texts in dict.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="evaluation.load_predicted_data">
 <span class="sig-prename descclassname"><span class="pre">evaluation.</span></span><span class="sig-name descname"><span class="pre">load_predicted_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_to_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#evaluation.load_predicted_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Crate a list of the outputs that the API returned
-:param path_to_file:
-:return: api_result_list</p>
+<dd><p>Crate a list of the outputs that the API returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path_to_file</strong> – Path to the source file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>api_result_list</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -351,9 +357,15 @@ an answer is required of the user).</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.setup_logging">
 <span class="sig-prename descclassname"><span class="pre">helpers.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity_level</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.setup_logging" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configure the logging module used in this script.
-:param verbosity_level:  Verbosity level is set with args.
-:return: None</p>
+<dd><p>Configure the logging module used in this script.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>verbosity_level</strong> – Verbosity level is set with args.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -388,12 +400,11 @@ append them to a JSONL file which is used in further processing.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="jsonlcrafter.craft_jsonl">
 <span class="sig-prename descclassname"><span class="pre">jsonlcrafter.</span></span><span class="sig-name descname"><span class="pre">craft_jsonl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_output</span></span><span class="p"><span class="pre">:</span></span><span class="w">  </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jsonlcrafter.craft_jsonl" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform the data in the jsonlines format needed by OpenAI for model fine tuning.
-:param output_file: Path to file where output will be saved.</p>
+<dd><p>Transform the data in the jsonlines format needed by OpenAI for model fine tuning.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prompt</strong> – Baseline API prompt.</p></li>
+<li><p><strong>output_file</strong> – Path to file where output will be saved.</p></li>
 <li><p><strong>msg_dict</strong> – Dictionary with loaded messages.</p></li>
 <li><p><strong>desired_output</strong> – This is the desired answer from the API</p></li>
 </ul>

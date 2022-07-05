@@ -1,28 +1,163 @@
-Welcome to Phishing detection with GPT-3â€™s documentation!
-*********************************************************
-
-
+Welcome to Phishing detection with GPT-3’s documentation!¶
+Python_project_Phishing_detection_with_GPT-3¶
+email_phish_check module¶
+email_phish_check.main()¶ 
+This is where the main functionality of this script resides. First the user supplied arguments are handled, such as the path to files or customized config file. By default, the OpenAI API key is loaded from an environment variable but can be also set manually using the appropriate argument. For some attributes,such as the JSON config, there are default values set. This external config is parsed to a dictionary.
+After the arguments are handled, the actual execution follows. At first, all the supplied paths which are loaded as a list are converted to Path() objects for better handling. If a path points at a directory, it is converted to multiple paths to all files in the directory. Afterwards all loaded files are opened and saved to a dictionary where the filename is the key and the file contents the value.
+The keys are printed to confirm with the user if he actually wants to send these files to the API. This is done using the known [y/n] prompt. If this is denied, the script terminates. After confirming the prompt, all files are sent to the API one by one. Each response is being logged to a file and also internally to a dictionary. After all API calls are finished, the simplified dictionary with all responses is printed.
+Returns: 
+None
+email_phish_check.open_messages_jsonl_db(message_jsonl_db) ? dict¶ 
+Load the messages from prepared JSONL file.
+Parameters: 
+message_jsonl_db – Path to the file with prepared messages.
+Returns: 
+Return the dictionary with filename as keys and file contents as values.
+email_phish_check.api_call_completion_endpoint(config: dict, msg_input: str)¶ 
+Perform the actual api call to the ‘completion’ endpoint. The parameter msg_input is appended to the ‘prompt’ specified in the config.
+Parameters: 
+    • config – API configuration as dict loaded from JSON
+    • msg_input – The actual message body to be analyzed.
+Returns: 
+The API response.
+email_phish_check.api_calls_on_dict(config: dict, msg_dict: dict, msg_jsonl_db, results_db) ? dict¶ 
+Perform multiple API calls, one call per key-value in the supplied dict.
+Parameters: 
+    • config – API configuration as dict loaded from JSON.
+    • msg_dict – Dictionary with messages to be analyzed.
+Returns: 
+Dictionary with all api responses.
+email_phish_check.get_text_from_response_dict(api_result_dict: dict) ? dict¶ 
+Iterate over the given dictionary and extract only the actual response text from the api response. Return the response texts in dict.
+Parameters: 
+api_result_dict – Dict with the API JSON responses.
+Returns: 
+Dict with the filename as key and the textual response as value.
+email_phish_check.prettyprint_api_text_response_dict(used_api_prompt: str, api_result_text_dict: dict)¶ 
+Print the API responses from a dict with the corresponding initial prompt in a pretty way.
+Parameters: 
+    • used_api_prompt – The base API prompt, should be loaded from the used JSON config.
+    • api_result_text_dict – Dict with text extracted from the API responses.
+Returns: 
+None
+email_phish_check.api_response_get_text(response) ? str¶ 
+Get the response text from the response JSON.
+Parameters: 
+response – Response JSON.
+Returns: 
+Extracted text.
+email_phish_check.api_response_get_bool(responded_text: str) ? bool¶ 
+Return true false based by the yes/no response from API, determined using basic regex.
+Parameters: 
+responded_text – The API result which will be evalulated.
+Returns: 
+The “answer” return value is True for “yes” or False for “no”.
+evaluation module¶
+evaluation.main()¶ 
+evaluation.print_evaluation(y_true: list, y_pred: list)¶ 
+Compare the two arguments and determine if the classification performed by the API was correct.
+Parameters: 
+    • y_true – The correct classification of the email message.
+    • y_pred – Classification of the message by the API.
+Returns: 
+print of the evaluation.
+evaluation.load_expected_data(path_to_file)¶ 
+Crate a list of the expected outputs
+Parameters: 
+path_to_file – 
+Returns: 
+expected_result_list
+evaluation.load_predicted_data(path_to_file)¶ 
+Crate a list of the outputs that the API returned
+Parameters: 
+path_to_file – Path to the source file.
+Returns: 
+api_result_list
+finetune module¶
+finetune.craft_jsonl(output_file: str, prompt: str, msg_dict: dict, desired_output: str)¶ 
+Transform the data in the jsonlines format needed by OpenAI for model fine tuning. :param output_file: Path to file where output will be saved.
+Parameters: 
+    • prompt – Baseline API prompt.
+    • msg_dict – Dictionary with loaded messages.
+    • desired_output – This is the desired answer from the API
+Returns: 
+None
+finetune.custom_text_filter(text: str) ? str¶ 
+All the filtering options applied to the message body.
+Parameters: 
+text – Text to be filtered.
+Returns: 
+Filtered text.
+finetune.main()¶ 
+Separate from the main program. This script generates the JSONL used for model finetuning.
+Returns: 
+helpers module¶
+helpers.get_paths_list(supplied_path_list: list) ? list¶ 
+Transform the supplied paths strings into Path() objects from pathlib. If the provided path is a directory, all files in that directory are extracted as single paths.
+Parameters: 
+supplied_path_list – strings supplied by the user
+Returns: 
+list with Path() objects
+helpers.open_file_list(files_list: list) ? dict¶ 
+Open all text files from the supplied path list and save the file contents in a dictionary, key being the filename and the value the file content.
+Parameters: 
+files_list – list with Path objects
+Returns: 
+Dictionary with content from loaded files
+helpers.open_message(textfile) ? str¶ 
+Open the supplied textfile and return the contents.
+Parameters: 
+textfile – the file to be opened
+Returns: 
+filecontents, newlines are stripped
+helpers.custom_text_filter(text: str) ? str¶ 
+All the filtering options applied to the message body.
+Parameters: 
+text – Text to be filtered.
+Returns: 
+Filtered text.
+helpers.query_yes_no(question: str, default='no') ? bool¶ 
+Ask a yes/no question via raw_input() and return their answer.
+Parameters: 
+    • question – String that is presented to the user.
+    • default – The presumed answer if the user just hits <Enter>. It must be “yes” (the default), “no” or None (meaning an answer is required of the user).
+Returns: 
+The “answer” return value is True for “yes” or False for “no”.
+helpers.setup_logging(verbosity_level)¶ 
+Configure the logging module used in this script. :param verbosity_level: Verbosity level is set with args. :return: None
+helpers.parse_api_json_config(configfile)¶ 
+Parse the external JSON config file for the openai configuration.
+Parameters: 
+configfile – path to the config file
+Returns: 
+JSON form the config file parsed to dict
+jsonlcrafter module¶
+jsonlcrafter.main()¶ 
+This is module is used to load (multiple) message files from a directory, assign the expected classification and append them to a JSONL file which is used in further processing.
+Returns: 
+None
+jsonlcrafter.craft_jsonl(output_file: str, msg_dict: dict, desired_output: bool)¶ 
+Transform the data in the jsonlines format needed by OpenAI for model fine tuning.
+Parameters: 
+    • output_file – Path to file where output will be saved.
+    • msg_dict – Dictionary with loaded messages.
+    • desired_output – This is the desired answer from the API
+Returns: 
+None
+jsonlcrafter.custom_text_filter(text: str) ? str¶ 
+All the filtering options applied to the message body.
+Parameters: 
+text – Text to be filtered.
+Returns: 
+Filtered text.
+Indices and tables¶
+    • Index
+    • Module Index
+    • Search Page
+Phishing detection with GPT-3
+Navigation
 Contents:
-^^^^^^^^^
-
-* Python_project_Phishing_detection_with_GPT-3
-
-  * email_phish_check module
-
-  * evaluation module
-
-  * finetune module
-
-  * helpers module
-
-  * jsonlcrafter module
-
-
-Indices and tables
-******************
-
-* Index
-
-* Module Index
-
-* Search Page
+    • Python_project_Phishing_detection_with_GPT-3 
+Related Topics
+    • Documentation overview
+©2022, T0masHr. | Powered by Sphinx 5.0.2 & Alabaster 0.7.12 

@@ -165,6 +165,7 @@ def query_yes_no(question: str, default="no") ->  bool:
 def setup_logging(verbosity_level):
     """
     Configure the logging module used in this script.
+
     :param verbosity_level:  Verbosity level is set with args.
     :return: None
     """
