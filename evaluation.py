@@ -48,7 +48,8 @@ def load_expected_data(path_to_file):
 def load_predicted_data(path_to_file):
     """
     Crate a list of the outputs that the API returned
-    :param path_to_file:
+
+    :param path_to_file: Path to the source file.
     :return: api_result_list
     """
     api_result_list = []

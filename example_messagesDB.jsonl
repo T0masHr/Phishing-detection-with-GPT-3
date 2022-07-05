@@ -1,0 +1,11 @@
+{
+  "file": "filename.txt",
+  "message_text": "message text loaded from file",
+  "phishing": true,
+  "api_result" : true,
+}
+
+
+
+
+
